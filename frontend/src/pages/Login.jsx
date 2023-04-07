@@ -12,13 +12,27 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const history = useNavigate();
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
+  const history = useNavigate();
+  const toastOptions = {
+    position: "bottom-right",
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+    theme: "light",
+  };
   const loginUser = async () => {
+    setIsSubmitted(true);
     return axios
       .post(`http://localhost:5000/api/login`, {
         email,
@@ -30,10 +44,15 @@ const Login = () => {
         history("/administrator");
       })
       .catch((err) => {
-        console.log(err);
+        toast.error(`${err.response.data.msg}`, toastOptions);
       });
   };
+  const [isValid, setIsValid] = useState(false);
 
+  const handleChange = (event) => {
+    setEmail(event.target.value);
+    setIsValid(event.target.checkValidity());
+  };
   return (
     <Box
       sx={{
@@ -42,6 +61,18 @@ const Login = () => {
         overflow: "hidden",
       }}
     >
+      <ToastContainer
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
       <Container maxWidth="sm" sx={{ height: "100%" }}>
         <Box
           sx={{
@@ -60,17 +91,26 @@ const Login = () => {
               </Typography>
               <TextField
                 label="Email"
+                type="email"
                 variant="outlined"
-                margin="normal"
                 fullWidth
+                required
+                pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                error={isSubmitted && !isValid}
+                helperText={
+                  isSubmitted &&
+                  !isValid &&
+                  "Please enter a valid email address"
+                }
+                onChange={handleChange}
               />
               <TextField
                 label="Password"
                 variant="outlined"
                 margin="normal"
                 fullWidth
+                required
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}

@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../utils/useAuth";
 import {
@@ -20,10 +22,21 @@ import {
   Box,
 } from "@mui/material";
 
+const toastOptions = {
+  position: "bottom-right",
+  autoClose: 5000,
+  hideProgressBar: false,
+  closeOnClick: true,
+  pauseOnHover: true,
+  draggable: true,
+  progress: undefined,
+  theme: "light",
+};
+
 const Administrator = () => {
   const [users, setUsers] = useState([
-    { id: 1, name: "Alice", email: "alice@example.com", role: "user" },
-    { id: 2, name: "Bob", email: "bob@example.com", role: "user" },
+    { id: 1, name: "Alice", email: "alice@example.com", role: "pacient" },
+    { id: 2, name: "Bob", email: "bob@example.com", role: "pacient" },
     { id: 3, name: "Charlie", email: "charlie@example.com", role: "admin" },
   ]);
 
@@ -36,7 +49,7 @@ const Administrator = () => {
   const [open, setOpen] = useState(false);
   const history = useNavigate();
 
-  const { authenticated, loading } = useAuth();
+  const { authenticated, loading, userRole } = useAuth();
 
   if (loading) {
     return <div>Loading...</div>;
@@ -44,6 +57,13 @@ const Administrator = () => {
   if (!authenticated) {
     history("/login");
     return null;
+  }
+  if (userRole !== "Administrator") {
+    toast.error(
+      `You are not an Administrator, please login go to ${userRole} page`,
+      toastOptions
+    );
+    history("/login");
   }
   const logoutUser = () => {
     localStorage.removeItem("token");
@@ -109,7 +129,7 @@ const Administrator = () => {
                       value={user.role}
                       onChange={(event) => handleRoleChange(user.id, event)}
                     >
-                      <MenuItem value="user">User</MenuItem>
+                      <MenuItem value="pacient">Pacient</MenuItem>
                       <MenuItem value="admin">Admin</MenuItem>
                     </Select>
                   </TableCell>
