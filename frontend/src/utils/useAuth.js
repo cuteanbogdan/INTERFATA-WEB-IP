@@ -23,7 +23,7 @@ const useAuth = () => {
                     },
                 });
                 const data = await response.json();
-                const userRoleAfterVerify = data.token.role
+                const userRoleAfterVerify = data.data.role
                 setUserRole(userRoleAfterVerify)
                 if (response.ok) {
                     setAuthenticated(true);

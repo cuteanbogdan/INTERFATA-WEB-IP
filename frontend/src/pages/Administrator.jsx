@@ -39,23 +39,22 @@ const Administrator = () => {
   const history = useNavigate();
   const token = localStorage.getItem("token");
   const { authenticated, loading, userRole } = useAuth();
-
+  const fetchUsers = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/api/getallusers", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
+      console.log(data);
+      setUsers(data.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await fetch("http://localhost:5000/api/getallusers", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const data = await response.json();
-        setUsers(data.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
     fetchUsers();
   }, []);
   if (loading) {
@@ -78,8 +77,6 @@ const Administrator = () => {
   };
 
   const handleDeleteUser = async (userId) => {
-    const updatedUsers = users.filter((user) => user.id !== userId);
-    setUsers(updatedUsers);
     try {
       const response = await fetch(
         `http://localhost:5000/api/delete-user/${userId}`,
@@ -90,6 +87,7 @@ const Administrator = () => {
           },
         }
       );
+      fetchUsers();
     } catch (error) {
       console.log(error);
     }
@@ -110,7 +108,7 @@ const Administrator = () => {
         }
       );
       const data = await response.json();
-      window.location.reload(false);
+      fetchUsers();
     } catch (error) {
       console.log(error);
     }
@@ -149,6 +147,8 @@ const Administrator = () => {
                       <MenuItem value="Medic">Medic</MenuItem>
                       <MenuItem value="Pacient">Pacient</MenuItem>
                       <MenuItem value="Administrator">Administrator</MenuItem>
+                      <MenuItem value="Supraveghetor">Supraveghetor</MenuItem>
+                      <MenuItem value="Ingrijitor">Ingrijitor</MenuItem>
                     </Select>
                   </TableCell>
                   <TableCell>
