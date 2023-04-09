@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ToastContainer, toast } from "react-toastify";
+import UserForm from "./UserForm";
+import axios from "axios";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../utils/useAuth";
@@ -14,11 +16,9 @@ import {
   Select,
   MenuItem,
   Button,
-  TextField,
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions,
   Box,
 } from "@mui/material";
 
@@ -34,23 +34,30 @@ const toastOptions = {
 };
 
 const Administrator = () => {
-  const [users, setUsers] = useState([
-    { id: 1, name: "Alice", email: "alice@example.com", role: "pacient" },
-    { id: 2, name: "Bob", email: "bob@example.com", role: "pacient" },
-    { id: 3, name: "Charlie", email: "charlie@example.com", role: "admin" },
-  ]);
-
-  const [userDetails, setUserDetails] = useState({
-    name: "",
-    email: "",
-    role: "user",
-  });
-
+  const [users, setUsers] = useState([]);
   const [open, setOpen] = useState(false);
   const history = useNavigate();
-
+  const token = localStorage.getItem("token");
   const { authenticated, loading, userRole } = useAuth();
 
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/getallusers", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = await response.json();
+        setUsers(data.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchUsers();
+  }, []);
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -70,34 +77,43 @@ const Administrator = () => {
     history("/login");
   };
 
-  const handleUserDetailsChange = (event) => {
-    const { name, value } = event.target;
-    setUserDetails((prevUserDetails) => ({
-      ...prevUserDetails,
-      [name]: value,
-    }));
+  const handleDeleteUser = async (userId) => {
+    const updatedUsers = users.filter((user) => user.id !== userId);
+    setUsers(updatedUsers);
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/delete-user/${userId}`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  const handleCreateUserClick = () => {
-    // TODO: create a new user with the userDetails data
-    setUserDetails({
-      name: "",
-      email: "",
-      role: "user",
-    });
-  };
-
-  const handleRoleChange = (userId, event) => {
-    const { value } = event.target;
-    setUsers((prevUsers) => {
-      const updatedUsers = [...prevUsers];
-      const userIndex = updatedUsers.findIndex((user) => user.id === userId);
-      updatedUsers[userIndex] = {
-        ...updatedUsers[userIndex],
-        role: value,
-      };
-      return updatedUsers;
-    });
+  const handleRoleChange = async (userId, event) => {
+    const role = event.target.value;
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/update-user-role/${userId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ role }),
+        }
+      );
+      const data = await response.json();
+      window.location.reload(false);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -116,6 +132,7 @@ const Administrator = () => {
                 <TableCell>Name</TableCell>
                 <TableCell>Email</TableCell>
                 <TableCell>Role</TableCell>
+                <TableCell></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -129,9 +146,19 @@ const Administrator = () => {
                       value={user.role}
                       onChange={(event) => handleRoleChange(user.id, event)}
                     >
-                      <MenuItem value="pacient">Pacient</MenuItem>
-                      <MenuItem value="admin">Admin</MenuItem>
+                      <MenuItem value="Medic">Medic</MenuItem>
+                      <MenuItem value="Pacient">Pacient</MenuItem>
+                      <MenuItem value="Administrator">Administrator</MenuItem>
                     </Select>
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      onClick={() => handleDeleteUser(user.id)}
+                    >
+                      Delete
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}
@@ -139,7 +166,18 @@ const Administrator = () => {
           </Table>
         </TableContainer>
       </Box>
-
+      <ToastContainer
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
       <Box
         sx={{
           width: "20%",
@@ -160,46 +198,8 @@ const Administrator = () => {
       <Dialog open={open} onClose={() => setOpen(false)}>
         <DialogTitle>Create User</DialogTitle>
         <DialogContent>
-          <TextField
-            label="Name"
-            name="name"
-            value={userDetails.name}
-            onChange={handleUserDetailsChange}
-            fullWidth
-            margin="normal"
-          />
-          <TextField
-            label="Email"
-            name="email"
-            value={userDetails.email}
-            onChange={handleUserDetailsChange}
-            fullWidth
-            margin="normal"
-          />
-          <Select
-            label="Role"
-            name="role"
-            value={userDetails.role}
-            onChange={handleUserDetailsChange}
-            fullWidth
-            margin="normal"
-          >
-            <MenuItem value="user">User</MenuItem>
-            <MenuItem value="admin">Admin</MenuItem>
-          </Select>
+          <UserForm />
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpen(false)}>Cancel</Button>
-          <Button
-            onClick={() => {
-              handleCreateUserClick();
-              setOpen(false);
-            }}
-            variant="contained"
-          >
-            Create
-          </Button>
-        </DialogActions>
       </Dialog>
     </Box>
   );
