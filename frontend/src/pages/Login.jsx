@@ -132,7 +132,11 @@ const Login = () => {
             spacing={2}
           >
             <Grid item xs={6}>
-              <Button variant="contained" fullWidth>
+              <Button
+                variant="contained"
+                fullWidth
+                onClick={() => history("/change-password")}
+              >
                 Change Password
               </Button>
             </Grid>

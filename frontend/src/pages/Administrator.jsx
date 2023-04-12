@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import UserForm from "./UserForm";
 import axios from "axios";
+import { styled } from "@mui/material/styles";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../utils/useAuth";
@@ -20,6 +21,8 @@ import {
   DialogTitle,
   DialogContent,
   Box,
+  Typography,
+  Grid,
 } from "@mui/material";
 
 const toastOptions = {
@@ -32,6 +35,16 @@ const toastOptions = {
   progress: undefined,
   theme: "light",
 };
+const CustomTableCell = styled(TableCell)(({ theme }) => ({
+  borderBottom: "1px solid #e0e0e0",
+  color: theme.palette.text.primary,
+}));
+
+const CustomTableRow = styled(TableRow)(({ theme }) => ({
+  "&:hover": {
+    backgroundColor: theme.palette.action.hover,
+  },
+}));
 
 const Administrator = () => {
   const [users, setUsers] = useState([]);
@@ -48,7 +61,6 @@ const Administrator = () => {
         },
       });
       const data = await response.json();
-      console.log(data);
       setUsers(data.data);
     } catch (error) {
       console.log(error);
@@ -115,86 +127,88 @@ const Administrator = () => {
   };
 
   return (
-    <Box sx={{ display: "flex" }}>
-      <Box
-        sx={{
-          flex: 1,
-          padding: "1rem",
-        }}
-      >
-        <TableContainer component={Paper} style={{ marginTop: "4rem" }}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>ID</TableCell>
-                <TableCell>Name</TableCell>
-                <TableCell>Email</TableCell>
-                <TableCell>Role</TableCell>
-                <TableCell></TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {users.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell>{user.id}</TableCell>
-                  <TableCell>{user.name}</TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>
-                    <Select
-                      value={user.role}
-                      onChange={(event) => handleRoleChange(user.id, event)}
-                    >
-                      <MenuItem value="Medic">Medic</MenuItem>
-                      <MenuItem value="Pacient">Pacient</MenuItem>
-                      <MenuItem value="Administrator">Administrator</MenuItem>
-                      <MenuItem value="Supraveghetor">Supraveghetor</MenuItem>
-                      <MenuItem value="Ingrijitor">Ingrijitor</MenuItem>
-                    </Select>
-                  </TableCell>
-                  <TableCell>
-                    <Button
-                      variant="outlined"
-                      color="error"
-                      onClick={() => handleDeleteUser(user.id)}
-                    >
-                      Delete
-                    </Button>
-                  </TableCell>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        backgroundColor: "#f5f5f5",
+        padding: "2rem",
+      }}
+    >
+      <Grid container spacing={3}>
+        <Grid item xs={10}>
+          <Typography variant="h4" sx={{ marginBottom: "2rem" }}>
+            User Management
+          </Typography>
+        </Grid>
+        <Grid item xs={12}>
+          <TableContainer component={Paper} elevation={2}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <CustomTableCell>ID</CustomTableCell>
+                  <CustomTableCell>Name</CustomTableCell>
+                  <CustomTableCell>Email</CustomTableCell>
+                  <CustomTableCell>Role</CustomTableCell>
+                  <CustomTableCell>Action</CustomTableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Box>
-      <ToastContainer
-        position="bottom-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      />
-      <Box
-        sx={{
-          width: "20%",
-          position: "fixed",
-          top: 0,
-          right: 0,
-          padding: "1rem",
-        }}
-      >
-        <Button variant="contained" onClick={() => setOpen(true)}>
-          Create User
-        </Button>
-        <Button variant="contained" onClick={() => logoutUser()}>
-          Logout
-        </Button>
-      </Box>
-
+              </TableHead>
+              <TableBody>
+                {users.map((user) => (
+                  <CustomTableRow key={user.id}>
+                    <CustomTableCell>{user.id}</CustomTableCell>
+                    <CustomTableCell>{user.name}</CustomTableCell>
+                    <CustomTableCell>{user.email}</CustomTableCell>
+                    <CustomTableCell>
+                      <Select
+                        value={user.role}
+                        onChange={(event) => handleRoleChange(user.id, event)}
+                      >
+                        <MenuItem value="Medic">Medic</MenuItem>
+                        <MenuItem value="Pacient">Pacient</MenuItem>
+                        <MenuItem value="Administrator">Administrator</MenuItem>
+                        <MenuItem value="Supraveghetor">Supraveghetor</MenuItem>
+                        <MenuItem value="Ingrijitor">Ingrijitor</MenuItem>
+                      </Select>
+                    </CustomTableCell>
+                    <CustomTableCell>
+                      <Button
+                        variant="outlined"
+                        color="error"
+                        onClick={() => handleDeleteUser(user.id)}
+                      >
+                        Delete
+                      </Button>
+                    </CustomTableCell>
+                  </CustomTableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => setOpen(true)}
+            fullWidth
+          >
+            Create User
+          </Button>
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={() => logoutUser()}
+            fullWidth
+          >
+            Logout
+          </Button>
+        </Grid>
+      </Grid>
+      <ToastContainer {...toastOptions} />
       <Dialog open={open} onClose={() => setOpen(false)}>
         <DialogTitle>Create User</DialogTitle>
         <DialogContent>
