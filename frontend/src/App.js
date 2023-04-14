@@ -4,12 +4,13 @@ import Administrator from "./pages/Administrator";
 import Medic from './pages/Medic';
 import ChangePassword from './pages/ChangePassword';
 import UpdatePassword from './pages/UpdatePassword';
-
+import StartPage from "./pages/StartPage"
 
 function App() {
   return (
     <Router>
       <Routes>
+        <Route exact path="/" element={<StartPage />} />
         <Route exact path="/login" element={<Login />} />
         <Route exact path="/administrator" element={<Administrator />} />
         <Route exact path="/medic" element={<Medic />} />

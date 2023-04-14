@@ -24,9 +24,11 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
+  Grid,
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import PacientForm from "./PacientForm";
+import useAuthRoles from "../utils/useAuthRoles";
 
 const initialFormData = {
   name: "",
@@ -48,6 +50,10 @@ const Medic = () => {
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [formData, setFormData] = useState(initialFormData);
   const history = useNavigate();
+  const { authenticated, loading, userRole } = useAuthRoles([
+    "Administrator",
+    "Medic",
+  ]);
 
   // Fetch patients data from server and set the state
   const fetchPatients = async () => {
@@ -72,20 +78,19 @@ const Medic = () => {
     localStorage.removeItem("token");
     history("/login");
   };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!authenticated) {
+    logoutUser();
+    return null;
+  }
+
   const handleEdit = (patient) => {
     setSelectedPatient(patient);
     setOpen(true);
-    // setFormData({
-    //   name: patient.name,
-    //   age: patient.age,
-    //   gender: patient.gender,
-    //   medicalCondition: patient.medicalCondition,
-    //   alarmParameters: {
-    //     heartRate: patient.alarmParameters.heartRate,
-    //     bloodPressure: patient.alarmParameters.bloodPressure,
-    //     temperature: patient.alarmParameters.temperature,
-    //   },
-    // });
   };
 
   const handleDeletePacient = async (userId) => {
@@ -105,143 +110,134 @@ const Medic = () => {
     }
   };
   const handleFormChange = (event) => {
-    const { name, value } = event.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    // const { name, value } = event.target;
+    // setFormData({
+    //   ...formData,
+    //   [name]: value,
+    // });
   };
 
   const handleAlarmChange = (event) => {
-    const { name, value } = event.target;
-    setFormData({
-      ...formData,
-      alarmParameters: {
-        ...formData.alarmParameters,
-        [name]: value,
-      },
-    });
+    // const { name, value } = event.target;
+    // setFormData({
+    //   ...formData,
+    //   alarmParameters: {
+    //     ...formData.alarmParameters,
+    //     [name]: value,
+    //   },
+    // });
   };
 
   const handleFormSubmit = async (event) => {
-    event.preventDefault();
-    try {
-      await fetch(`/api/patients/${selectedPatient.id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-      setPatients(
-        patients.map((patient) => {
-          if (patient.id === selectedPatient.id) {
-            return {
-              ...patient,
-              name: formData.name,
-              age: formData.age,
-              gender: formData.gender,
-              medicalCondition: formData.medicalCondition,
-              alarmParameters: {
-                heartRate: formData.alarmParameters.heartRate,
-                bloodPressure: formData.alarmParameters.bloodPressure,
-                temperature: formData.alarmParameters.temperature,
-              },
-            };
-          } else {
-            return patient;
-          }
-        })
-      );
-      setSelectedPatient(null);
-      setOpen(false);
-      setFormData(initialFormData);
-    } catch (error) {
-      console.error(error);
-    }
+    // event.preventDefault();
+    // try {
+    //   await fetch(`/api/patients/${selectedPatient.id}`, {
+    //     method: "PUT",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //     body: JSON.stringify(formData),
+    //   });
+    //   setPatients(
+    //     patients.map((patient) => {
+    //       if (patient.id === selectedPatient.id) {
+    //         return {
+    //           ...patient,
+    //           name: formData.name,
+    //           age: formData.age,
+    //           gender: formData.gender,
+    //           medicalCondition: formData.medicalCondition,
+    //           alarmParameters: {
+    //             heartRate: formData.alarmParameters.heartRate,
+    //             bloodPressure: formData.alarmParameters.bloodPressure,
+    //             temperature: formData.alarmParameters.temperature,
+    //           },
+    //         };
+    //       }
+    //       return patient;
+    //     })
+    //   );
+    //   setOpen(false);
+    // } catch (error) {
+    //   console.log(error);
+    // }
+  };
+
+  const handleView = (patient) => {
+    setSelectedPatient(patient);
+    history(`/patient/${patient.id}`);
   };
 
   return (
-    <div>
-      <Typography variant="h3" style={{ marginTop: "20px" }}>
-        Patients List
-      </Typography>
-      <Box
-        sx={{
-          width: "20%",
-          position: "fixed",
-          top: 0,
-          right: 0,
-          padding: "1rem",
-        }}
-      >
-        <Button variant="contained" onClick={() => setOpenCreate(true)}>
-          Create Pacient
-        </Button>
-        <Button variant="contained" onClick={() => logoutUser()}>
-          Logout
-        </Button>
-        <Dialog open={openCreate} onClose={() => setOpenCreate(false)}>
-          <DialogTitle>Create Pacient</DialogTitle>
-          <DialogContent>
-            <PacientForm />
-          </DialogContent>
-        </Dialog>
-      </Box>
-      <TableContainer component={Paper} style={{ marginTop: "20px" }}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell>Age</TableCell>
-              <TableCell>Gender</TableCell>
-              <TableCell>Medical Condition</TableCell>
-              <TableCell>Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {patients.map((patient) => (
-              <TableRow key={patient.id}>
-                <TableCell>{patient.name}</TableCell>
-                <TableCell>{patient.age}</TableCell>
-                <TableCell>{patient.gender}</TableCell>
-                <TableCell>{patient.medicalCondition}</TableCell>
-                <TableCell>
-                  <Button
-                    component={Link}
-                    to={`/patient/${patient.id}`}
-                    variant="outlined"
-                  >
-                    View
-                  </Button>{" "}
-                  <Button
-                    variant="outlined"
-                    onClick={() => handleEdit(patient)}
-                  >
-                    Edit
-                  </Button>{" "}
-                  <Button
-                    variant="outlined"
-                    color="error"
-                    onClick={() => handleDeletePacient(patient.id)}
-                  >
-                    Delete
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+    <Box sx={{ flexGrow: 1, padding: 4 }}>
+      <Grid container spacing={4}>
+        <Grid item xs={12}>
+          <Typography variant="h4" gutterBottom>
+            Patients
+          </Typography>
+          <Divider />
+        </Grid>
+        <Grid item xs={12}>
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Name</TableCell>
+                  <TableCell>Age</TableCell>
+                  <TableCell>Gender</TableCell>
+                  <TableCell>Medical Condition</TableCell>
+                  <TableCell>Actions</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {patients.map((patient) => (
+                  <TableRow key={patient.id}>
+                    <TableCell>{patient.name}</TableCell>
+                    <TableCell>{patient.age}</TableCell>
+                    <TableCell>{patient.gender}</TableCell>
+                    <TableCell>{patient.medicalCondition}</TableCell>
+                    <TableCell>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => handleView(patient)}
+                      >
+                        View
+                      </Button>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => handleEdit(patient)}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        variant="contained"
+                        color="secondary"
+                        onClick={() => handleDeletePacient(patient.id)}
+                      >
+                        Delete
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Grid>
+        <Grid item xs={12}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => setOpenCreate(true)}
+          >
+            Create New Patient
+          </Button>
+        </Grid>
+      </Grid>{" "}
       <Modal
         open={open}
-        onClose={() => {
-          setOpen(false);
-          setSelectedPatient(null);
-          setFormData(initialFormData);
-        }}
-        aria-labelledby="edit-patient-modal"
-        aria-describedby="modal for editing patient"
+        onClose={() => setOpen(false)}
         closeAfterTransition
         sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}
       >
@@ -343,7 +339,33 @@ const Medic = () => {
           </Box>
         </Fade>
       </Modal>
-    </div>
+      <Dialog
+        open={openCreate}
+        onClose={() => setOpenCreate(false)}
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle>Create New Patient</DialogTitle>
+        <DialogContent>
+          <PacientForm
+            formData={initialFormData}
+            handleFormChange={handleFormChange}
+            handleAlarmChange={handleAlarmChange}
+            handleFormSubmit={handleFormSubmit}
+            setOpen={setOpenCreate}
+          />
+        </DialogContent>
+      </Dialog>
+      <Button
+        variant="outlined"
+        color="error"
+        onClick={logoutUser}
+        sx={{ position: "absolute", right: 4, top: 4 }}
+      >
+        Logout
+      </Button>
+    </Box>
   );
 };
+
 export default Medic;

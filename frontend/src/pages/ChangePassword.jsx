@@ -8,6 +8,7 @@ import {
   Button,
   Container,
 } from "@mui/material";
+import { ToastContainer, toast } from "react-toastify";
 
 const ChangePassword = () => {
   const [email, setEmail] = useState("");
@@ -36,10 +37,29 @@ const ChangePassword = () => {
 
         if (response.ok) {
           // Handle success
-          console.log("Password reset link sent successfully to:", email);
+          toast.success(`Password reset link sent successfully to: ${email}`, {
+            position: "bottom-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
         } else {
+          const data = await response.json();
           // Handle error
-          console.log("Error sending password reset link");
+          toast.error(`${data.message}`, {
+            position: "bottom-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
         }
       } catch (error) {
         console.log("Error:", error);
@@ -56,6 +76,18 @@ const ChangePassword = () => {
         height: "100vh",
       }}
     >
+      <ToastContainer
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
       <Container maxWidth="md" sx={{ height: "100%" }}>
         <Box
           sx={{

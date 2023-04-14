@@ -8,32 +8,75 @@ import {
   Select,
   Box,
 } from "@mui/material";
+import { ToastContainer, toast } from "react-toastify";
 
 const UserForm = () => {
-  const [userType, setUserType] = useState("doctor");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+  const [role, setRole] = useState("Administrator");
+  const [name, setName] = useState("");
+  const [password, setPassword] = useState("");
   const [age, setAge] = useState("");
   const [phone, setPhone] = useState("");
   const [medicalCondition, setMedicalCondition] = useState("");
+  const token = localStorage.getItem("token");
+  const [email, setEmail] = useState("");
 
   const handleUserTypeChange = (event) => {
-    setUserType(event.target.value);
-    setFirstName("");
-    setLastName("");
+    setRole(event.target.value);
+    setName("");
+    setPassword("");
     setAge("");
-    setPhone("");
+    setEmail("");
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    console.log("Form submitted:", {
-      userType,
-      firstName,
-      lastName,
-      age,
-      phone,
-    });
+
+    try {
+      const response = await fetch("http://localhost:5000/api/register", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          role,
+          name,
+          password,
+          age,
+          email,
+        }),
+      });
+
+      if (response.ok) {
+        // Handle success
+        toast.success(`User ${name} added successfully`, {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+      } else {
+        const data = await response.json();
+        // Handle error
+        // data.message in case of JWT expired
+        toast.error(`${data.message || data.msg}`, {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+      }
+    } catch (error) {
+      console.error("Error submitting the form:", error);
+    }
   };
 
   return (
@@ -44,18 +87,32 @@ const UserForm = () => {
         height: "100vh",
       }}
     >
+      <ToastContainer
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
       <form onSubmit={handleSubmit}>
         <FormControl fullWidth margin="normal">
           <InputLabel>User Type</InputLabel>
           <Select
-            value={userType}
+            value={role}
             onChange={handleUserTypeChange}
             label="User Type"
             required
           >
-            <MenuItem value="doctor">Doctor</MenuItem>
-            <MenuItem value="nurse">Nurse</MenuItem>
-            <MenuItem value="patient">Patient</MenuItem>
+            <MenuItem value="Administrator">Administrator</MenuItem>
+            <MenuItem value="Medic">Medic</MenuItem>
+            <MenuItem value="Pacient">Pacient</MenuItem>
+            <MenuItem value="Ingrijitor">Ingrijitor</MenuItem>
+            <MenuItem value="Supraveghetor">Supraveghetor</MenuItem>
           </Select>
         </FormControl>
         <Box
@@ -65,27 +122,29 @@ const UserForm = () => {
             width: "50%",
           }}
         >
-          {userType === "doctor" && (
+          {role === "Medic" && (
             <>
               <TextField
-                label="First Name"
+                label="Name"
                 variant="outlined"
                 margin="normal"
                 fullWidth
                 sx={{ width: "200%" }}
                 required
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
               />
+
               <TextField
-                label="Last Name"
+                label="Password"
                 variant="outlined"
                 margin="normal"
                 fullWidth
                 sx={{ width: "200%" }}
                 required
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                type="password"
               />
               <TextField
                 label="Age"
@@ -99,61 +158,73 @@ const UserForm = () => {
               />
             </>
           )}
-          {userType === "nurse" && (
+          {role === "Administrator" && (
             <>
               <TextField
-                label="First Name"
+                label="Name"
                 variant="outlined"
                 margin="normal"
                 fullWidth
                 sx={{ width: "200%" }}
                 required
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
               />
               <TextField
-                label="Last Name"
+                label="Email"
                 variant="outlined"
                 margin="normal"
                 fullWidth
                 sx={{ width: "200%" }}
                 required
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
               <TextField
-                label="PhoneNumber"
+                label="Password"
                 variant="outlined"
                 margin="normal"
                 fullWidth
                 sx={{ width: "200%" }}
                 required
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                value={password}
+                type="password"
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <TextField
+                label="Age"
+                variant="outlined"
+                margin="normal"
+                fullWidth
+                sx={{ width: "200%" }}
+                type="number"
+                value={age}
+                onChange={(e) => setAge(e.target.value)}
               />
             </>
           )}
-          {userType === "patient" && (
+          {role === "Pacient" && (
             <>
               <TextField
-                label="First Name"
+                label="Name"
                 variant="outlined"
                 margin="normal"
                 fullWidth
                 sx={{ width: "200%" }}
                 required
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
               />
               <TextField
-                label="Last Name"
+                label="Password"
                 variant="outlined"
                 margin="normal"
                 fullWidth
                 sx={{ width: "200%" }}
                 required
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
+                value={password}
+                type="password"
+                onChange={(e) => setPassword(e.target.value)}
               />
               <TextField
                 label="Age"

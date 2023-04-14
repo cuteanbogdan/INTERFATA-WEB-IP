@@ -76,6 +76,7 @@ const Administrator = () => {
     history("/login");
     return null;
   }
+
   if (userRole !== "Administrator") {
     toast.error(
       `You are not an Administrator, please login go to ${userRole} page`,

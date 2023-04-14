@@ -1,85 +1,87 @@
 import React, { useState, useEffect } from "react";
-import { ToastContainer, toast } from "react-toastify";
-import UserForm from "./UserForm";
-import axios from "axios";
-import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
-import useAuth from "../utils/useAuth";
+
 import {
-  Table,
-  TableBody,
-  TableCell,
   TableContainer,
+  Table,
   TableHead,
   TableRow,
+  TableCell,
+  TableBody,
   Paper,
+  Button,
+  Modal,
+  Backdrop,
+  Fade,
+  TextField,
+  FormControl,
+  InputLabel,
   Select,
   MenuItem,
-  Button,
+  Typography,
+  Box,
+  Divider,
   Dialog,
   DialogTitle,
   DialogContent,
-  Box,
+  Grid,
 } from "@mui/material";
+import { Link } from "react-router-dom";
+import PacientForm from "./PacientForm";
 
-const toastOptions = {
-  position: "bottom-right",
-  autoClose: 5000,
-  hideProgressBar: false,
-  closeOnClick: true,
-  pauseOnHover: true,
-  draggable: true,
-  progress: undefined,
-  theme: "light",
+const initialFormData = {
+  name: "",
+  age: "",
+  gender: "",
+  medicalCondition: "",
+  alarmParameters: {
+    heartRate: "",
+    bloodPressure: "",
+    temperature: "",
+  },
 };
 
-const Administrator = () => {
-  const [users, setUsers] = useState([]);
-  const [open, setOpen] = useState(false);
-  const history = useNavigate();
+const Medic = () => {
   const token = localStorage.getItem("token");
-  const { authenticated, loading, userRole } = useAuth();
-  const fetchUsers = async () => {
+  const [patients, setPatients] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [openCreate, setOpenCreate] = useState(false);
+  const [selectedPatient, setSelectedPatient] = useState(null);
+  const [formData, setFormData] = useState(initialFormData);
+  const history = useNavigate();
+
+  // Fetch patients data from server and set the state
+  const fetchPatients = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/getallusers", {
+      const response = await fetch("http://localhost:5000/api/getallpacients", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
       const data = await response.json();
-      console.log(data);
-      setUsers(data.data);
+      setPatients(data.data);
     } catch (error) {
       console.log(error);
     }
   };
+
   useEffect(() => {
-    fetchUsers();
+    fetchPatients();
   }, []);
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-  if (!authenticated) {
-    history("/login");
-    return null;
-  }
-  if (userRole !== "Administrator") {
-    toast.error(
-      `You are not an Administrator, please login go to ${userRole} page`,
-      toastOptions
-    );
-    history("/login");
-  }
   const logoutUser = () => {
     localStorage.removeItem("token");
     history("/login");
   };
+  const handleEdit = (patient) => {
+    setSelectedPatient(patient);
+    setOpen(true);
+  };
 
-  const handleDeleteUser = async (userId) => {
+  const handleDeletePacient = async (userId) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/delete-user/${userId}`,
+        `http://localhost:5000/api/delete-pacient/${userId}`,
         {
           method: "POST",
           headers: {
@@ -87,122 +89,171 @@ const Administrator = () => {
           },
         }
       );
-      fetchUsers();
+      fetchPatients();
     } catch (error) {
       console.log(error);
     }
   };
+  const handleFormChange = (event) => {
+    const { name, value } = event.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
 
-  const handleRoleChange = async (userId, event) => {
-    const role = event.target.value;
+  const handleAlarmChange = (event) => {
+    const { name, value } = event.target;
+    setFormData({
+      ...formData,
+      alarmParameters: {
+        ...formData.alarmParameters,
+        [name]: value,
+      },
+    });
+  };
+
+  const handleFormSubmit = async (event) => {
+    event.preventDefault();
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/update-user-role/${userId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ role }),
-        }
+      await fetch(`/api/patients/${selectedPatient.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      setPatients(
+        patients.map((patient) => {
+          if (patient.id === selectedPatient.id) {
+            return {
+              ...patient,
+              name: formData.name,
+              age: formData.age,
+              gender: formData.gender,
+              medicalCondition: formData.medicalCondition,
+              alarmParameters: {
+                heartRate: formData.alarmParameters.heartRate,
+                bloodPressure: formData.alarmParameters.bloodPressure,
+                temperature: formData.alarmParameters.temperature,
+              },
+            };
+          }
+          return patient;
+        })
       );
-      const data = await response.json();
-      fetchUsers();
+      setOpen(false);
     } catch (error) {
       console.log(error);
     }
   };
 
   return (
-    <Box sx={{ display: "flex" }}>
-      <Box
-        sx={{
-          flex: 1,
-          padding: "1rem",
-        }}
-      >
-        <TableContainer component={Paper} style={{ marginTop: "4rem" }}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>ID</TableCell>
-                <TableCell>Name</TableCell>
-                <TableCell>Email</TableCell>
-                <TableCell>Role</TableCell>
-                <TableCell></TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {users.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell>{user.id}</TableCell>
-                  <TableCell>{user.name}</TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>
-                    <Select
-                      value={user.role}
-                      onChange={(event) => handleRoleChange(user.id, event)}
-                    >
-                      <MenuItem value="Medic">Medic</MenuItem>
-                      <MenuItem value="Pacient">Pacient</MenuItem>
-                      <MenuItem value="Administrator">Administrator</MenuItem>
-                      <MenuItem value="Supraveghetor">Supraveghetor</MenuItem>
-                      <MenuItem value="Ingrijitor">Ingrijitor</MenuItem>
-                    </Select>
-                  </TableCell>
-                  <TableCell>
-                    <Button
-                      variant="outlined"
-                      color="error"
-                      onClick={() => handleDeleteUser(user.id)}
-                    >
-                      Delete
-                    </Button>
-                  </TableCell>
+    <Box sx={{ flexGrow: 1, padding: 4 }}>
+      <Grid container spacing={4}>
+        <Grid item xs={12}>
+          <Typography variant="h4" gutterBottom>
+            Patients
+          </Typography>
+          <Divider />
+        </Grid>
+        <Grid item xs={12}>
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Name</TableCell>
+                  <TableCell>Age</TableCell>
+                  <TableCell>Gender</TableCell>
+                  <TableCell>Medical Condition</TableCell>
+                  <TableCell>Actions</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Box>
-      <ToastContainer
-        position="bottom-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      />
-      <Box
-        sx={{
-          width: "20%",
-          position: "fixed",
-          top: 0,
-          right: 0,
-          padding: "1rem",
+              </TableHead>
+              <TableBody>
+                {patients.map((patient) => (
+                  <TableRow key={patient.id}>
+                    <TableCell>{patient.name}</TableCell>
+                    <TableCell>{patient.age}</TableCell>
+                    <TableCell>{patient.gender}</TableCell>
+                    <TableCell>{patient.medicalCondition}</TableCell>
+                    <TableCell>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => handleEdit(patient)}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        variant="contained"
+                        color="secondary"
+                        onClick={() => handleDeletePacient(patient.id)}
+                      >
+                        Delete
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Grid>
+        <Grid item xs={12}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => setOpenCreate(true)}
+          >
+            Create New Patient
+          </Button>
+        </Grid>
+      </Grid>{" "}
+      <Modal
+        open={open}
+        onClose={() => setOpen(false)}
+        closeAfterTransition
+        BackdropComponent={Backdrop}
+        BackdropProps={{
+          timeout: 500,
         }}
       >
-        <Button variant="contained" onClick={() => setOpen(true)}>
-          Create User
-        </Button>
-        <Button variant="contained" onClick={() => logoutUser()}>
-          Logout
-        </Button>
-      </Box>
-
-      <Dialog open={open} onClose={() => setOpen(false)}>
-        <DialogTitle>Create User</DialogTitle>
+        <Fade in={open}>
+          <PacientForm
+            formData={formData}
+            handleFormChange={handleFormChange}
+            handleAlarmChange={handleAlarmChange}
+            handleFormSubmit={handleFormSubmit}
+            setOpen={setOpen}
+          />
+        </Fade>
+      </Modal>
+      <Dialog
+        open={openCreate}
+        onClose={() => setOpenCreate(false)}
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle>Create New Patient</DialogTitle>
         <DialogContent>
-          <UserForm />
+          <PacientForm
+            formData={initialFormData}
+            handleFormChange={handleFormChange}
+            handleAlarmChange={handleAlarmChange}
+            handleFormSubmit={handleFormSubmit}
+            setOpen={setOpenCreate}
+          />
         </DialogContent>
       </Dialog>
+      <Button
+        variant="outlined"
+        color="error"
+        onClick={logoutUser}
+        sx={{ position: "absolute", right: 4, top: 4 }}
+      >
+        Logout
+      </Button>
     </Box>
   );
 };
 
-export default Administrator;
+export default Medic;
