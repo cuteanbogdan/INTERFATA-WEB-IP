@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { ToastContainer, toast } from "react-toastify";
 import UserForm from "./UserForm";
 import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
 import { styled } from "@mui/material/styles";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
@@ -77,13 +77,6 @@ const Administrator = () => {
     return null;
   }
 
-  if (userRole !== "Administrator") {
-    toast.error(
-      `You are not an Administrator, please login go to ${userRole} page`,
-      toastOptions
-    );
-    history("/login");
-  }
   const logoutUser = () => {
     localStorage.removeItem("token");
     history("/login");
@@ -100,6 +93,18 @@ const Administrator = () => {
           },
         }
       );
+      if (response.ok) {
+        // Handle success
+        fetchUsers();
+        const data = await response.json();
+        toast.success(`${data.msg}`, toastOptions);
+      } else {
+        const data = await response.json();
+        // Handle error
+        // data.message in case of JWT expired
+        // Handle error with single message
+        toast.error(`${data.message || data.msg}`, toastOptions);
+      }
       fetchUsers();
     } catch (error) {
       console.log(error);
@@ -137,6 +142,18 @@ const Administrator = () => {
         padding: "2rem",
       }}
     >
+      <ToastContainer
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
       <Grid container spacing={3}>
         <Grid item xs={10}>
           <Typography variant="h4" sx={{ marginBottom: "2rem" }}>
@@ -209,11 +226,10 @@ const Administrator = () => {
           </Button>
         </Grid>
       </Grid>
-      <ToastContainer {...toastOptions} />
       <Dialog open={open} onClose={() => setOpen(false)}>
         <DialogTitle>Create User</DialogTitle>
         <DialogContent>
-          <UserForm />
+          <UserForm fetchUsers={fetchUsers} toastOptions={toastOptions} />
         </DialogContent>
       </Dialog>
     </Box>

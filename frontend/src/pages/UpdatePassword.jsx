@@ -10,7 +10,16 @@ import {
 } from "@mui/material";
 import { ToastContainer, toast } from "react-toastify";
 import { useNavigate, useLocation } from "react-router-dom";
-
+const toastOptions = {
+  position: "bottom-right",
+  autoClose: 5000,
+  hideProgressBar: false,
+  closeOnClick: true,
+  pauseOnHover: true,
+  draggable: true,
+  progress: undefined,
+  theme: "light",
+};
 const UpdatePassword = () => {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
@@ -34,29 +43,13 @@ const UpdatePassword = () => {
       );
 
       if (response.ok) {
+        const data = await response.json();
         // Handle success
-        toast.success("Password updated successfully", {
-          position: "bottom-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
+        toast.success(`${data.msg}`, toastOptions);
       } else {
+        const data = await response.json();
         // Handle error
-        toast.error(`Error updating the password`, {
-          position: "bottom-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
+        toast.error(`${data.msg}`, toastOptions);
       }
     } catch (error) {
       console.log("Error:", error);

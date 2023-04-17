@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
 
 import {
   TableContainer,
@@ -40,6 +41,16 @@ const initialFormData = {
     bloodPressure: "",
     temperature: "",
   },
+};
+const toastOptions = {
+  position: "bottom-right",
+  autoClose: 5000,
+  hideProgressBar: false,
+  closeOnClick: true,
+  pauseOnHover: true,
+  draggable: true,
+  progress: undefined,
+  theme: "light",
 };
 
 const Medic = () => {
@@ -104,6 +115,18 @@ const Medic = () => {
           },
         }
       );
+      if (response.ok) {
+        // Handle success
+        fetchPatients();
+        const data = await response.json();
+        toast.success(`${data.msg}`, toastOptions);
+      } else {
+        const data = await response.json();
+        // Handle error
+        // data.message in case of JWT expired
+        // Handle error with single message
+        toast.error(`${data.message || data.msg}`, toastOptions);
+      }
       fetchPatients();
     } catch (error) {
       console.log(error);
@@ -170,6 +193,18 @@ const Medic = () => {
 
   return (
     <Box sx={{ flexGrow: 1, padding: 4 }}>
+      <ToastContainer
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
       <Grid container spacing={4}>
         <Grid item xs={12}>
           <Typography variant="h4" gutterBottom>

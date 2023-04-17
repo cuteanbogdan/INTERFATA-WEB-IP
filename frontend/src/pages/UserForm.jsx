@@ -8,9 +8,9 @@ import {
   Select,
   Box,
 } from "@mui/material";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 
-const UserForm = () => {
+const UserForm = ({ fetchUsers, toastOptions }) => {
   const [role, setRole] = useState("Administrator");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
@@ -49,30 +49,21 @@ const UserForm = () => {
 
       if (response.ok) {
         // Handle success
-        toast.success(`User ${name} added successfully`, {
-          position: "bottom-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
+        fetchUsers();
+        toast.success(`User ${name} added successfully`, toastOptions);
       } else {
         const data = await response.json();
         // Handle error
-        // data.message in case of JWT expired
-        toast.error(`${data.message || data.msg}`, {
-          position: "bottom-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
+        // Check if the response contains an errors array
+        if (data.errors && Array.isArray(data.errors)) {
+          data.errors.forEach((error, index) => {
+            toast.error(`${error}`, toastOptions);
+          });
+        } else {
+          // data.message in case of JWT expired
+          // Handle error with single message
+          toast.error(`${data.message || data.msg}`, toastOptions);
+        }
       }
     } catch (error) {
       console.error("Error submitting the form:", error);
@@ -87,18 +78,6 @@ const UserForm = () => {
         height: "100vh",
       }}
     >
-      <ToastContainer
-        position="bottom-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      />
       <form onSubmit={handleSubmit}>
         <FormControl fullWidth margin="normal">
           <InputLabel>User Type</InputLabel>

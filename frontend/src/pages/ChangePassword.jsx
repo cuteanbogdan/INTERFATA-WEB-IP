@@ -9,7 +9,16 @@ import {
   Container,
 } from "@mui/material";
 import { ToastContainer, toast } from "react-toastify";
-
+const toastOptions = {
+  position: "bottom-right",
+  autoClose: 5000,
+  hideProgressBar: false,
+  closeOnClick: true,
+  pauseOnHover: true,
+  draggable: true,
+  progress: undefined,
+  theme: "light",
+};
 const ChangePassword = () => {
   const [email, setEmail] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -36,30 +45,13 @@ const ChangePassword = () => {
         );
 
         if (response.ok) {
+          const data = await response.json();
           // Handle success
-          toast.success(`Password reset link sent successfully to: ${email}`, {
-            position: "bottom-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-          });
+          toast.success(`${data.msg} ${email}`, toastOptions);
         } else {
           const data = await response.json();
           // Handle error
-          toast.error(`${data.message}`, {
-            position: "bottom-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "light",
-          });
+          toast.error(`${data.msg}`, toastOptions);
         }
       } catch (error) {
         console.log("Error:", error);
