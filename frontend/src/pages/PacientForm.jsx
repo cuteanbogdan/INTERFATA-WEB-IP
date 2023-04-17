@@ -8,32 +8,72 @@ import {
   Select,
   Box,
 } from "@mui/material";
+import { toast } from "react-toastify";
 
-const PacientForm = () => {
-  const [userType, setUserType] = useState("Patient");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [age, setAge] = useState("");
-  const [phone, setPhone] = useState("");
-  const [medicalCondition, setMedicalCondition] = useState("");
+const PacientForm = ({ fetchPatients, toastOptions }) => {
+  const token = localStorage.getItem("token");
 
-  const handleUserTypeChange = (event) => {
-    setUserType(event.target.value);
-    setFirstName("");
-    setLastName("");
-    setAge("");
-    setPhone("");
-  };
+  const [cnp, setCnp] = useState("");
+  const [nume, setNume] = useState("");
+  const [prenume, setPrenume] = useState("");
+  const [adresa, setAdresa] = useState("");
+  const [nr_tel, setNr_tel] = useState("");
+  const [nr_tel_pers_contact, setNr_tel_pers_contact] = useState("");
+  const [email, setEmail] = useState("");
+  const [profesie, setProfesie] = useState("");
+  const [loc_munca, setLoc_munca] = useState("");
+  const [password, setPassword] = useState("");
+  const [varsta, setVarsta] = useState("");
 
-  const handleSubmit = (event) => {
+  const role = "Pacient";
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    console.log("Form submitted:", {
-      userType,
-      firstName,
-      lastName,
-      age,
-      phone,
-    });
+
+    try {
+      const response = await fetch("http://localhost:5000/api/register", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          role,
+          cnp,
+          nume,
+          prenume,
+          adresa,
+          nr_tel,
+          nr_tel_pers_contact,
+          email,
+          profesie,
+          loc_munca,
+          password,
+          varsta,
+        }),
+      });
+
+      if (response.ok) {
+        // Handle success
+        fetchPatients();
+        toast.success(`Pacient ${nume} added successfully`, toastOptions);
+      } else {
+        const data = await response.json();
+        // Handle error
+        // Check if the response contains an errors array
+        if (data.errors && Array.isArray(data.errors)) {
+          data.errors.forEach((error, index) => {
+            toast.error(`${error}`, toastOptions);
+          });
+        } else {
+          // data.message in case of JWT expired
+          // Handle error with single message
+          toast.error(`${data.message || data.msg}`, toastOptions);
+        }
+      }
+    } catch (error) {
+      console.error("Error submitting the form:", error);
+    }
   };
 
   return (
@@ -54,55 +94,113 @@ const PacientForm = () => {
         >
           <>
             <TextField
-              label="First Name"
+              label="CNP"
               variant="outlined"
               margin="normal"
               fullWidth
               sx={{ width: "200%" }}
               required
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
+              value={cnp}
+              onChange={(e) => setCnp(e.target.value)}
             />
             <TextField
-              label="Last Name"
+              label="Nume"
               variant="outlined"
               margin="normal"
               fullWidth
               sx={{ width: "200%" }}
               required
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
+              value={nume}
+              onChange={(e) => setNume(e.target.value)}
             />
             <TextField
-              label="Age"
+              label="Prenume"
               variant="outlined"
               margin="normal"
               fullWidth
               sx={{ width: "200%" }}
-              type="number"
-              value={age}
-              onChange={(e) => setAge(e.target.value)}
+              value={prenume}
+              onChange={(e) => setPrenume(e.target.value)}
             />
             <TextField
-              label="Phone Number"
-              variant="outlined"
-              margin="normal"
-              fullWidth
-              sx={{ width: "200%" }}
-              required
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-            />
-            <TextField
-              label="Medical Condition"
+              label="Varsta"
               variant="outlined"
               margin="normal"
               fullWidth
               sx={{ width: "200%" }}
               multiline
-              rows={4}
-              value={medicalCondition}
-              onChange={(e) => setMedicalCondition(e.target.value)}
+              value={varsta}
+              onChange={(e) => setVarsta(e.target.value)}
+            />
+            <TextField
+              label="Adresa"
+              variant="outlined"
+              margin="normal"
+              fullWidth
+              sx={{ width: "200%" }}
+              required
+              value={adresa}
+              onChange={(e) => setAdresa(e.target.value)}
+            />
+            <TextField
+              label="Numar de telefon"
+              variant="outlined"
+              margin="normal"
+              fullWidth
+              sx={{ width: "200%" }}
+              multiline
+              value={nr_tel}
+              onChange={(e) => setNr_tel(e.target.value)}
+            />
+            <TextField
+              label="Numar telefon persoana de contact"
+              variant="outlined"
+              margin="normal"
+              fullWidth
+              sx={{ width: "200%" }}
+              required
+              value={nr_tel_pers_contact}
+              onChange={(e) => setNr_tel_pers_contact(e.target.value)}
+            />
+            <TextField
+              label="Email"
+              variant="outlined"
+              margin="normal"
+              fullWidth
+              sx={{ width: "200%" }}
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <TextField
+              label="Profesie"
+              variant="outlined"
+              margin="normal"
+              fullWidth
+              sx={{ width: "200%" }}
+              required
+              value={profesie}
+              onChange={(e) => setProfesie(e.target.value)}
+            />
+            <TextField
+              label="Loc de munca"
+              variant="outlined"
+              margin="normal"
+              fullWidth
+              sx={{ width: "200%" }}
+              required
+              value={loc_munca}
+              onChange={(e) => setLoc_munca(e.target.value)}
+            />
+            <TextField
+              label="Parola"
+              variant="outlined"
+              margin="normal"
+              fullWidth
+              sx={{ width: "200%" }}
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
             />
           </>
           <Button

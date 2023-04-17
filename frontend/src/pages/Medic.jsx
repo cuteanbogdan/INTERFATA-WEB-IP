@@ -77,6 +77,7 @@ const Medic = () => {
       });
       const data = await response.json();
       setPatients(data.data);
+      console.log(patients);
     } catch (error) {
       console.log(error);
     }
@@ -217,20 +218,20 @@ const Medic = () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Age</TableCell>
-                  <TableCell>Gender</TableCell>
-                  <TableCell>Medical Condition</TableCell>
+                  <TableCell>CNP</TableCell>
+                  <TableCell>Nume</TableCell>
+                  <TableCell>Prenume</TableCell>
+                  <TableCell>Varsta</TableCell>
                   <TableCell>Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {patients.map((patient) => (
                   <TableRow key={patient.id}>
-                    <TableCell>{patient.name}</TableCell>
-                    <TableCell>{patient.age}</TableCell>
-                    <TableCell>{patient.gender}</TableCell>
-                    <TableCell>{patient.medicalCondition}</TableCell>
+                    <TableCell>{patient.cnp}</TableCell>
+                    <TableCell>{patient.nume}</TableCell>
+                    <TableCell>{patient.prenume}</TableCell>
+                    <TableCell>{patient.varsta}</TableCell>
                     <TableCell>
                       <Button
                         variant="contained"
@@ -249,7 +250,7 @@ const Medic = () => {
                       <Button
                         variant="contained"
                         color="secondary"
-                        onClick={() => handleDeletePacient(patient.id)}
+                        onClick={() => handleDeletePacient(patient.id_pacient)}
                       >
                         Delete
                       </Button>
@@ -383,11 +384,8 @@ const Medic = () => {
         <DialogTitle>Create New Patient</DialogTitle>
         <DialogContent>
           <PacientForm
-            formData={initialFormData}
-            handleFormChange={handleFormChange}
-            handleAlarmChange={handleAlarmChange}
-            handleFormSubmit={handleFormSubmit}
-            setOpen={setOpenCreate}
+            fetchPatients={fetchPatients}
+            toastOptions={toastOptions}
           />
         </DialogContent>
       </Dialog>

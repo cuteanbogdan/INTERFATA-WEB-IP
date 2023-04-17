@@ -12,45 +12,67 @@ import { toast } from "react-toastify";
 
 const UserForm = ({ fetchUsers, toastOptions }) => {
   const [role, setRole] = useState("Administrator");
-  const [name, setName] = useState("");
-  const [password, setPassword] = useState("");
-  const [age, setAge] = useState("");
-  const [phone, setPhone] = useState("");
-  const [medicalCondition, setMedicalCondition] = useState("");
   const token = localStorage.getItem("token");
+
+  const [cnp, setCnp] = useState("");
+  const [nume, setNume] = useState("");
+  const [prenume, setPrenume] = useState("");
+  const [adresa, setAdresa] = useState("");
+  const [nr_tel, setNr_tel] = useState("");
+  const [nr_tel_pers_contact, setNr_tel_pers_contact] = useState("");
   const [email, setEmail] = useState("");
+  const [profesie, setProfesie] = useState("");
+  const [loc_munca, setLoc_munca] = useState("");
+  const [password, setPassword] = useState("");
+  const [varsta, setVarsta] = useState("");
 
   const handleUserTypeChange = (event) => {
     setRole(event.target.value);
-    setName("");
-    setPassword("");
-    setAge("");
-    setEmail("");
+  };
+  const buildRequestBody = () => {
+    const baseRequestBody = {
+      role,
+      nume,
+      password,
+      email,
+    };
+
+    if (role === "Pacient") {
+      return {
+        ...baseRequestBody,
+        cnp,
+        prenume,
+        adresa,
+        nr_tel,
+        nr_tel_pers_contact,
+        profesie,
+        loc_munca,
+        varsta,
+      };
+    }
+    // Add other user types and their specific properties if needed
+    return baseRequestBody;
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
     try {
+      const requestBody = buildRequestBody();
+
       const response = await fetch("http://localhost:5000/api/register", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          role,
-          name,
-          password,
-          age,
-          email,
-        }),
+        body: JSON.stringify(requestBody),
       });
 
       if (response.ok) {
         // Handle success
         fetchUsers();
-        toast.success(`User ${name} added successfully`, toastOptions);
+        toast.success(`User ${nume} added successfully`, toastOptions);
       } else {
         const data = await response.json();
         // Handle error
@@ -104,14 +126,14 @@ const UserForm = ({ fetchUsers, toastOptions }) => {
           {role === "Medic" && (
             <>
               <TextField
-                label="Name"
+                label="Nume"
                 variant="outlined"
                 margin="normal"
                 fullWidth
                 sx={{ width: "200%" }}
                 required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                value={nume}
+                onChange={(e) => setNume(e.target.value)}
               />
 
               <TextField
@@ -125,29 +147,19 @@ const UserForm = ({ fetchUsers, toastOptions }) => {
                 onChange={(e) => setPassword(e.target.value)}
                 type="password"
               />
-              <TextField
-                label="Age"
-                variant="outlined"
-                margin="normal"
-                fullWidth
-                sx={{ width: "200%" }}
-                type="number"
-                value={age}
-                onChange={(e) => setAge(e.target.value)}
-              />
             </>
           )}
           {role === "Administrator" && (
             <>
               <TextField
-                label="Name"
+                label="Nume"
                 variant="outlined"
                 margin="normal"
                 fullWidth
                 sx={{ width: "200%" }}
                 required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                value={nume}
+                onChange={(e) => setNume(e.target.value)}
               />
               <TextField
                 label="Email"
@@ -170,71 +182,118 @@ const UserForm = ({ fetchUsers, toastOptions }) => {
                 type="password"
                 onChange={(e) => setPassword(e.target.value)}
               />
-              <TextField
-                label="Age"
-                variant="outlined"
-                margin="normal"
-                fullWidth
-                sx={{ width: "200%" }}
-                type="number"
-                value={age}
-                onChange={(e) => setAge(e.target.value)}
-              />
             </>
           )}
           {role === "Pacient" && (
             <>
               <TextField
-                label="Name"
+                label="CNP"
                 variant="outlined"
                 margin="normal"
                 fullWidth
                 sx={{ width: "200%" }}
                 required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                value={cnp}
+                onChange={(e) => setCnp(e.target.value)}
               />
               <TextField
-                label="Password"
+                label="Nume"
+                variant="outlined"
+                margin="normal"
+                fullWidth
+                sx={{ width: "200%" }}
+                required
+                value={nume}
+                onChange={(e) => setNume(e.target.value)}
+              />
+              <TextField
+                label="Prenume"
+                variant="outlined"
+                margin="normal"
+                fullWidth
+                sx={{ width: "200%" }}
+                value={prenume}
+                onChange={(e) => setPrenume(e.target.value)}
+              />
+              <TextField
+                label="Varsta"
+                variant="outlined"
+                margin="normal"
+                fullWidth
+                sx={{ width: "200%" }}
+                multiline
+                value={varsta}
+                onChange={(e) => setVarsta(e.target.value)}
+              />
+              <TextField
+                label="Adresa"
+                variant="outlined"
+                margin="normal"
+                fullWidth
+                sx={{ width: "200%" }}
+                required
+                value={adresa}
+                onChange={(e) => setAdresa(e.target.value)}
+              />
+              <TextField
+                label="Numar de telefon"
+                variant="outlined"
+                margin="normal"
+                fullWidth
+                sx={{ width: "200%" }}
+                multiline
+                value={nr_tel}
+                onChange={(e) => setNr_tel(e.target.value)}
+              />
+              <TextField
+                label="Numar telefon persoana de contact"
+                variant="outlined"
+                margin="normal"
+                fullWidth
+                sx={{ width: "200%" }}
+                required
+                value={nr_tel_pers_contact}
+                onChange={(e) => setNr_tel_pers_contact(e.target.value)}
+              />
+              <TextField
+                label="Email"
+                variant="outlined"
+                margin="normal"
+                fullWidth
+                sx={{ width: "200%" }}
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <TextField
+                label="Profesie"
+                variant="outlined"
+                margin="normal"
+                fullWidth
+                sx={{ width: "200%" }}
+                required
+                value={profesie}
+                onChange={(e) => setProfesie(e.target.value)}
+              />
+              <TextField
+                label="Loc de munca"
+                variant="outlined"
+                margin="normal"
+                fullWidth
+                sx={{ width: "200%" }}
+                required
+                value={loc_munca}
+                onChange={(e) => setLoc_munca(e.target.value)}
+              />
+              <TextField
+                label="Parola"
                 variant="outlined"
                 margin="normal"
                 fullWidth
                 sx={{ width: "200%" }}
                 required
                 value={password}
-                type="password"
                 onChange={(e) => setPassword(e.target.value)}
-              />
-              <TextField
-                label="Age"
-                variant="outlined"
-                margin="normal"
-                fullWidth
-                sx={{ width: "200%" }}
-                type="number"
-                value={age}
-                onChange={(e) => setAge(e.target.value)}
-              />
-              <TextField
-                label="Phone Number"
-                variant="outlined"
-                margin="normal"
-                fullWidth
-                sx={{ width: "200%" }}
-                required
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-              />
-              <TextField
-                label="Medical Condition"
-                variant="outlined"
-                margin="normal"
-                fullWidth
-                sx={{ width: "200%" }}
-                multiline
-                rows={4}
-                value={medicalCondition}
-                onChange={(e) => setMedicalCondition(e.target.value)}
               />
             </>
           )}
