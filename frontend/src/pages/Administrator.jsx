@@ -131,7 +131,14 @@ const Administrator = () => {
       console.log(error);
     }
   };
-
+  function getNonNullId(user) {
+    for (const key in user) {
+      if (key.startsWith("id_") && user[key] !== null) {
+        return {userId:user[key], name:user['nume'], email:user['email'], role:user["rol"]}
+      }
+    }
+    return "Not found"; // Or any default value you'd like to use
+  }
   return (
     <Box
       sx={{
@@ -174,13 +181,14 @@ const Administrator = () => {
               </TableHead>
               <TableBody>
                 {users.map((user) => (
-                  <CustomTableRow key={user.id}>
-                    <CustomTableCell>{user.id}</CustomTableCell>
-                    <CustomTableCell>{user.name}</CustomTableCell>
-                    <CustomTableCell>{user.email}</CustomTableCell>
+                  <CustomTableRow key={getNonNullId(user)}>
+                    {console.log(getNonNullId(user).role)}
+                    <CustomTableCell>{getNonNullId(user).userId}</CustomTableCell>
+                    <CustomTableCell>{getNonNullId(user).name}</CustomTableCell>
+                    <CustomTableCell>{getNonNullId(user).email}</CustomTableCell>
                     <CustomTableCell>
                       <Select
-                        value={user.role}
+                        value={getNonNullId(user).role}
                         onChange={(event) => handleRoleChange(user.id, event)}
                       >
                         <MenuItem value="Medic">Medic</MenuItem>

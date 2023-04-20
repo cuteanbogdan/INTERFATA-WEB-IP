@@ -22,7 +22,7 @@ const useAuthRoles = (allowedRoles) => {
                     },
                 });
                 const data = await response.json();
-                const userRoleAfterVerify = data.data.role;
+                const userRoleAfterVerify = data.data.rol;
                 setUserRole(userRoleAfterVerify);
 
                 if (response.ok && allowedRoles.includes(userRoleAfterVerify)) {
