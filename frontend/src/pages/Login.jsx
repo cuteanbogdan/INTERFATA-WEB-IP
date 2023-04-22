@@ -9,6 +9,8 @@ import {
   Link,
   Container,
   Grid,
+  CssBaseline,
+  Avatar,
 } from "@mui/material";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -61,19 +63,9 @@ const Login = () => {
         overflow: "hidden",
       }}
     >
-      <ToastContainer
-        position="bottom-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      />
-      <Container maxWidth="sm" sx={{ height: "100%" }}>
+      <ToastContainer {...toastOptions} />
+      <Container component="main" maxWidth="xs">
+        <CssBaseline />
         <Box
           sx={{
             display: "flex",
@@ -81,14 +73,23 @@ const Login = () => {
             justifyContent: "center",
             alignItems: "center",
             height: "100%",
+            marginTop: "4rem",
           }}
         >
-          <Card sx={{ minWidth: 275, mb: 3 }}>
+          <Card>
             <CardContent>
-              <Box sx={{ display: "flex", justifyContent: "center" }}></Box>
-              <Typography variant="h5" align="center" gutterBottom>
-                SmartCare Login
-              </Typography>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                }}
+              >
+                <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}></Avatar>
+                <Typography component="h1" variant="h5">
+                  SmartCare Login
+                </Typography>
+              </Box>
               <TextField
                 label="Email"
                 type="email"
@@ -104,6 +105,7 @@ const Login = () => {
                   "Please enter a valid email address"
                 }
                 onChange={handleChange}
+                margin="normal"
               />
               <TextField
                 label="Password"
@@ -115,25 +117,41 @@ const Login = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
-            </CardContent>
-            <Box sx={{ display: "flex", justifyContent: "center", p: 2 }}>
-              <Button variant="contained" onClick={loginUser}>
-                Login
-              </Button>
-            </Box>
-            <Typography variant="subtitle2" align="center" sx={{ pb: 2 }}>
-              Don't have an account?{" "}
-              <Link href="#">Contact the administrator to create one.</Link>
-            </Typography>
-          </Card>
-          <Grid
-            sx={{ display: "flex", justifyContent: "center", p: 2 }}
-            container
-            spacing={2}
-          >
-            <Grid item xs={6}>
               <Button
                 variant="contained"
+                color="primary"
+                fullWidth
+                sx={{ mt: 2, mb: 2 }}
+                onClick={loginUser}
+              >
+                Login
+              </Button>
+              <Grid container>
+                <Grid item xs>
+                  <Typography variant="body2" align="center" sx={{ pb: 2 }}>
+                    Don't have an account?{" "}
+                    <Link href="#">
+                      Contact the administrator to create one.
+                    </Link>
+                  </Typography>
+                </Grid>
+              </Grid>
+            </CardContent>
+          </Card>
+          <Grid
+            container
+            spacing={2}
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              p: 2,
+              marginTop: "1rem",
+            }}
+          >
+            <Grid item xs={12}>
+              <Button
+                variant="contained"
+                color="secondary"
                 fullWidth
                 onClick={() => history("/change-password")}
               >

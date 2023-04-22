@@ -12,10 +12,16 @@ import {
   Card,
   CardContent,
   Grid,
+  Avatar,
 } from "@mui/material";
 import useAuthRoles from "../utils/useAuthRoles";
 import { useNavigate } from "react-router-dom";
+import { styled } from "@mui/system";
 
+const StyledPaper = styled(Paper)(({ theme }) => ({
+  padding: theme.spacing(3),
+  borderRadius: "15px",
+}));
 const Patient = () => {
   const [pacientData, setPacientData] = useState(null);
   const token = localStorage.getItem("token");
@@ -60,27 +66,63 @@ const Patient = () => {
   }
 
   return (
-    <Container maxWidth="sm">
-      {!pacientData ? (
-        <Typography>Loading...</Typography>
-      ) : (
-        <Card>
-          <CardContent>
-            <Typography variant="h4" component="div" gutterBottom>
-              {pacientData.nume} {pacientData.prenume}
+    <Container maxWidth="md">
+      <Grid container spacing={3}>
+        <Grid item xs={12}>
+          <StyledPaper>
+            <Box display="flex" alignItems="center">
+              <Avatar>{pacientData.nume.charAt(0)}</Avatar>
+              <Box ml={2}>
+                <Typography variant="h5" gutterBottom>
+                  {pacientData.nume} {pacientData.prenume}
+                </Typography>
+                <Typography variant="subtitle1">{pacientData.rol}</Typography>
+              </Box>
+            </Box>
+          </StyledPaper>
+        </Grid>
+
+        <Grid item xs={12} sm={6}>
+          <StyledPaper>
+            <Typography variant="h6" gutterBottom>
+              Personal Details
             </Typography>
-            <Grid container spacing={2}>
-              {Object.entries(pacientData).map(([key, value]) => (
-                <Grid item xs={12} sm={6} key={key}>
-                  <Typography>
-                    <strong>{key.replace(/_/g, " ")}:</strong> {value}
-                  </Typography>
-                </Grid>
-              ))}
-            </Grid>
-          </CardContent>
-        </Card>
-      )}
+            <Typography>
+              <strong>CNP:</strong> {pacientData.cnp}
+            </Typography>
+            <Typography>
+              <strong>Adresa:</strong> {pacientData.adresa}
+            </Typography>
+            <Typography>
+              <strong>Nr. Tel:</strong> {pacientData.nr_tel}
+            </Typography>
+            <Typography>
+              <strong>Nr. Tel Pers. Contact:</strong>{" "}
+              {pacientData.nr_tel_pers_contact}
+            </Typography>
+          </StyledPaper>
+        </Grid>
+
+        <Grid item xs={12} sm={6}>
+          <StyledPaper>
+            <Typography variant="h6" gutterBottom>
+              Work & Education
+            </Typography>
+            <Typography>
+              <strong>Email:</strong> {pacientData.email}
+            </Typography>
+            <Typography>
+              <strong>Profesie:</strong> {pacientData.profesie}
+            </Typography>
+            <Typography>
+              <strong>Loc Munca:</strong> {pacientData.loc_munca}
+            </Typography>
+            <Typography>
+              <strong>Varsta:</strong> {pacientData.varsta}
+            </Typography>
+          </StyledPaper>
+        </Grid>
+      </Grid>
     </Container>
   );
 };
