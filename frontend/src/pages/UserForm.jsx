@@ -11,7 +11,7 @@ import {
 import { toast } from "react-toastify";
 
 const UserForm = ({ fetchUsers, toastOptions }) => {
-  const [role, setRole] = useState("Administrator");
+  const [rol, setRol] = useState("Administrator");
   const token = localStorage.getItem("token");
 
   const [cnp, setCnp] = useState("");
@@ -27,21 +27,21 @@ const UserForm = ({ fetchUsers, toastOptions }) => {
   const [varsta, setVarsta] = useState("");
 
   const handleUserTypeChange = (event) => {
-    setRole(event.target.value);
+    setRol(event.target.value);
   };
   const buildRequestBody = () => {
     const baseRequestBody = {
-      role,
+      rol,
       nume,
+      prenume,
       password,
       email,
     };
 
-    if (role === "Pacient") {
+    if (rol === "Pacient") {
       return {
         ...baseRequestBody,
         cnp,
-        prenume,
         adresa,
         nr_tel,
         nr_tel_pers_contact,
@@ -50,7 +50,6 @@ const UserForm = ({ fetchUsers, toastOptions }) => {
         varsta,
       };
     }
-    // Add other user types and their specific properties if needed
     return baseRequestBody;
   };
 
@@ -104,13 +103,13 @@ const UserForm = ({ fetchUsers, toastOptions }) => {
         <FormControl fullWidth margin="normal">
           <InputLabel>User Type</InputLabel>
           <Select
-            value={role}
+            value={rol}
             onChange={handleUserTypeChange}
             label="User Type"
             required
           >
             <MenuItem value="Administrator">Administrator</MenuItem>
-            <MenuItem value="Medic">Medic</MenuItem>
+            <MenuItem value="Doctor">Doctor</MenuItem>
             <MenuItem value="Pacient">Pacient</MenuItem>
             <MenuItem value="Ingrijitor">Ingrijitor</MenuItem>
             <MenuItem value="Supraveghetor">Supraveghetor</MenuItem>
@@ -123,7 +122,7 @@ const UserForm = ({ fetchUsers, toastOptions }) => {
             width: "50%",
           }}
         >
-          {role === "Medic" && (
+          {rol === "Doctor" && (
             <>
               <TextField
                 label="Nume"
@@ -135,7 +134,26 @@ const UserForm = ({ fetchUsers, toastOptions }) => {
                 value={nume}
                 onChange={(e) => setNume(e.target.value)}
               />
-
+              <TextField
+                label="Prenume"
+                variant="outlined"
+                margin="normal"
+                fullWidth
+                sx={{ width: "200%" }}
+                required
+                value={prenume}
+                onChange={(e) => setPrenume(e.target.value)}
+              />
+              <TextField
+                label="Email"
+                variant="outlined"
+                margin="normal"
+                fullWidth
+                sx={{ width: "200%" }}
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
               <TextField
                 label="Password"
                 variant="outlined"
@@ -149,7 +167,7 @@ const UserForm = ({ fetchUsers, toastOptions }) => {
               />
             </>
           )}
-          {role === "Administrator" && (
+          {rol === "Administrator" && (
             <>
               <TextField
                 label="Nume"
@@ -160,6 +178,16 @@ const UserForm = ({ fetchUsers, toastOptions }) => {
                 required
                 value={nume}
                 onChange={(e) => setNume(e.target.value)}
+              />
+              <TextField
+                label="Prenume"
+                variant="outlined"
+                margin="normal"
+                fullWidth
+                sx={{ width: "200%" }}
+                required
+                value={prenume}
+                onChange={(e) => setPrenume(e.target.value)}
               />
               <TextField
                 label="Email"
@@ -184,7 +212,7 @@ const UserForm = ({ fetchUsers, toastOptions }) => {
               />
             </>
           )}
-          {role === "Pacient" && (
+          {rol === "Pacient" && (
             <>
               <TextField
                 label="CNP"
@@ -293,6 +321,97 @@ const UserForm = ({ fetchUsers, toastOptions }) => {
                 sx={{ width: "200%" }}
                 required
                 value={password}
+                type="password"
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </>
+          )}
+          {rol === "Ingrijitor" && (
+            <>
+              <TextField
+                label="Nume"
+                variant="outlined"
+                margin="normal"
+                fullWidth
+                sx={{ width: "200%" }}
+                required
+                value={nume}
+                onChange={(e) => setNume(e.target.value)}
+              />
+              <TextField
+                label="Prenume"
+                variant="outlined"
+                margin="normal"
+                fullWidth
+                sx={{ width: "200%" }}
+                required
+                value={prenume}
+                onChange={(e) => setPrenume(e.target.value)}
+              />
+              <TextField
+                label="Email"
+                variant="outlined"
+                margin="normal"
+                fullWidth
+                sx={{ width: "200%" }}
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <TextField
+                label="Password"
+                variant="outlined"
+                margin="normal"
+                fullWidth
+                sx={{ width: "200%" }}
+                required
+                value={password}
+                type="password"
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </>
+          )}
+          {rol === "Supraveghetor" && (
+            <>
+              <TextField
+                label="Nume"
+                variant="outlined"
+                margin="normal"
+                fullWidth
+                sx={{ width: "200%" }}
+                required
+                value={nume}
+                onChange={(e) => setNume(e.target.value)}
+              />
+              <TextField
+                label="Prenume"
+                variant="outlined"
+                margin="normal"
+                fullWidth
+                sx={{ width: "200%" }}
+                required
+                value={prenume}
+                onChange={(e) => setPrenume(e.target.value)}
+              />
+              <TextField
+                label="Email"
+                variant="outlined"
+                margin="normal"
+                fullWidth
+                sx={{ width: "200%" }}
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <TextField
+                label="Password"
+                variant="outlined"
+                margin="normal"
+                fullWidth
+                sx={{ width: "200%" }}
+                required
+                value={password}
+                type="password"
                 onChange={(e) => setPassword(e.target.value)}
               />
             </>

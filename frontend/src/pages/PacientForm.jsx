@@ -25,7 +25,7 @@ const PacientForm = ({ fetchPatients, toastOptions }) => {
   const [password, setPassword] = useState("");
   const [varsta, setVarsta] = useState("");
 
-  const role = "Pacient";
+  const rol = "Pacient";
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -38,7 +38,7 @@ const PacientForm = ({ fetchPatients, toastOptions }) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          role,
+          rol,
           cnp,
           nume,
           prenume,

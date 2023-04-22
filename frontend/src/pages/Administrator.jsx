@@ -134,11 +134,17 @@ const Administrator = () => {
   function getNonNullId(user) {
     for (const key in user) {
       if (key.startsWith("id_") && user[key] !== null) {
-        return {userId:user[key], name:user['nume'], email:user['email'], role:user["rol"]}
+        return {
+          userId: user[key],
+          name: user["nume"],
+          email: user["email"],
+          role: user["rol"],
+        };
       }
     }
     return "Not found"; // Or any default value you'd like to use
   }
+
   return (
     <Box
       sx={{
@@ -181,17 +187,23 @@ const Administrator = () => {
               </TableHead>
               <TableBody>
                 {users.map((user) => (
-                  <CustomTableRow key={getNonNullId(user)}>
+                  <CustomTableRow key={getNonNullId(user).email}>
                     {console.log(getNonNullId(user).role)}
-                    <CustomTableCell>{getNonNullId(user).userId}</CustomTableCell>
+                    <CustomTableCell>
+                      {getNonNullId(user).userId}
+                    </CustomTableCell>
                     <CustomTableCell>{getNonNullId(user).name}</CustomTableCell>
-                    <CustomTableCell>{getNonNullId(user).email}</CustomTableCell>
+                    <CustomTableCell>
+                      {getNonNullId(user).email}
+                    </CustomTableCell>
                     <CustomTableCell>
                       <Select
                         value={getNonNullId(user).role}
-                        onChange={(event) => handleRoleChange(user.id, event)}
+                        onChange={(event) =>
+                          handleRoleChange(getNonNullId(user).userId, event)
+                        }
                       >
-                        <MenuItem value="Medic">Medic</MenuItem>
+                        <MenuItem value="Doctor">Doctor</MenuItem>
                         <MenuItem value="Pacient">Pacient</MenuItem>
                         <MenuItem value="Administrator">Administrator</MenuItem>
                         <MenuItem value="Supraveghetor">Supraveghetor</MenuItem>
@@ -202,7 +214,9 @@ const Administrator = () => {
                       <Button
                         variant="outlined"
                         color="error"
-                        onClick={() => handleDeleteUser(user.id)}
+                        onClick={() =>
+                          handleDeleteUser(getNonNullId(user).email)
+                        }
                       >
                         Delete
                       </Button>

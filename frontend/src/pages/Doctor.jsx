@@ -53,7 +53,7 @@ const toastOptions = {
   theme: "light",
 };
 
-const Medic = () => {
+const Doctor = () => {
   const token = localStorage.getItem("token");
   const [patients, setPatients] = useState([]);
   const [open, setOpen] = useState(false);
@@ -63,7 +63,7 @@ const Medic = () => {
   const history = useNavigate();
   const { authenticated, loading, userRole } = useAuthRoles([
     "Administrator",
-    "Medic",
+    "Doctor",
   ]);
 
   // Fetch patients data from server and set the state
@@ -189,7 +189,7 @@ const Medic = () => {
 
   const handleView = (patient) => {
     setSelectedPatient(patient);
-    history(`/patient/${patient.id}`);
+    history(`/pacient/${patient.id_pacient}`);
   };
 
   return (
@@ -227,7 +227,7 @@ const Medic = () => {
               </TableHead>
               <TableBody>
                 {patients.map((patient) => (
-                  <TableRow key={patient.id}>
+                  <TableRow key={patient.id_pacient}>
                     <TableCell>{patient.cnp}</TableCell>
                     <TableCell>{patient.nume}</TableCell>
                     <TableCell>{patient.prenume}</TableCell>
@@ -401,4 +401,4 @@ const Medic = () => {
   );
 };
 
-export default Medic;
+export default Doctor;

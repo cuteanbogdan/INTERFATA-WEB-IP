@@ -23,7 +23,8 @@ const useAuth = () => {
                     },
                 });
                 const data = await response.json();
-                const userRoleAfterVerify = data.data.role
+                console.log(data)
+                const userRoleAfterVerify = data.data.rol
                 setUserRole(userRoleAfterVerify)
                 if (response.ok) {
                     setAuthenticated(true);
@@ -31,9 +32,9 @@ const useAuth = () => {
                     switch (userRoleAfterVerify) {
                         case "Administrator": history("/administrator")
                             break;
-                        case "Medic": history("/medic")
+                        case "Doctor": history("/doctor")
                             break;
-                        case "Pacient": history("/pacient")
+                        case "Pacient": history(`/pacient/${data.data.id_pacient}`)
                             break;
                         case "Ingrijitor": history("/ingrijitor")
                             break;
