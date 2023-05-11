@@ -22,7 +22,7 @@ const toastOptions = {
 };
 const UpdatePassword = () => {
   const [password, setPassword] = useState("");
-  const navigate = useNavigate();
+  const history = useNavigate();
   const location = useLocation();
 
   const queryParams = new URLSearchParams(location.search);
@@ -46,6 +46,7 @@ const UpdatePassword = () => {
         const data = await response.json();
         // Handle success
         toast.success(`${data.msg}`, toastOptions);
+        history("/login");
       } else {
         const data = await response.json();
         // Handle error

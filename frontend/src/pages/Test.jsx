@@ -1,150 +1,63 @@
-import React, { useState } from "react";
-import {
-  Box,
-  Card,
-  CardContent,
-  TextField,
-  Typography,
-  Button,
-  Link,
-  Container,
-  Grid,
-} from "@mui/material";
-import axios from "axios";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
-const Login = () => {
+const Test = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const history = useNavigate();
-  const toastOptions = {
-    position: "bottom-right",
-    autoClose: 5000,
-    hideProgressBar: false,
-    closeOnClick: true,
-    pauseOnHover: true,
-    draggable: true,
-    progress: undefined,
-    theme: "light",
-  };
-  const loginUser = async () => {
-    setIsSubmitted(true);
-    return axios
-      .post(`http://localhost:5000/api/login`, {
-        email,
-        password,
-      })
-      .then(async (response) => {
-        await console.log(response.data);
-        localStorage.setItem("token", response.data.token);
-        history("/administrator");
-      })
-      .catch((err) => {
-        toast.error(`${err.response.data.msg}`, toastOptions);
-      });
-  };
-  const [isValid, setIsValid] = useState(false);
-
-  const handleChange = (event) => {
-    setEmail(event.target.value);
-    setIsValid(event.target.checkValidity());
-  };
   return (
-    <Box
-      sx={{
-        backgroundSize: "cover",
-        height: "100vh",
-        overflow: "hidden",
-      }}
-    >
-      <ToastContainer
-        position="bottom-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      />
-      <Container maxWidth="sm" sx={{ height: "100%" }}>
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
-            height: "100%",
-          }}
-        >
-          <Card sx={{ minWidth: 275, mb: 3 }}>
-            <CardContent>
-              <Box sx={{ display: "flex", justifyContent: "center" }}></Box>
-              <Typography variant="h5" align="center" gutterBottom>
-                SmartCare Login
-              </Typography>
-              <TextField
-                label="Email"
-                type="email"
-                variant="outlined"
-                fullWidth
-                required
-                pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
-                value={email}
-                error={isSubmitted && !isValid}
-                helperText={
-                  isSubmitted &&
-                  !isValid &&
-                  "Please enter a valid email address"
-                }
-                onChange={handleChange}
-              />
-              <TextField
-                label="Password"
-                variant="outlined"
-                margin="normal"
-                fullWidth
-                required
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </CardContent>
-            <Box sx={{ display: "flex", justifyContent: "center", p: 2 }}>
-              <Button variant="contained" onClick={loginUser}>
-                Login
-              </Button>
-            </Box>
-            <Typography variant="subtitle2" align="center" sx={{ pb: 2 }}>
-              Don't have an account?{" "}
-              <Link href="#">Contact the administrator to create one.</Link>
-            </Typography>
-          </Card>
-          <Grid
-            sx={{ display: "flex", justifyContent: "center", p: 2 }}
-            container
-            spacing={2}
+    <div className="h-screen bg-gray-100 flex items-center justify-center">
+      <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 flex flex-col">
+        <div className="mb-4">
+          <label
+            className="block text-grey-darker text-sm font-bold mb-2"
+            htmlFor="email"
           >
-            <Grid item xs={6}>
-              <Button
-                variant="contained"
-                fullWidth
-                onClick={() => history("/change-password")}
-              >
-                Change Password
-              </Button>
-            </Grid>
-          </Grid>
-        </Box>
-      </Container>
-    </Box>
+            Email
+          </label>
+          <input
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker"
+            id="email"
+            type="email"
+            placeholder="Email"
+            value={email}
+          />
+        </div>
+        <div className="mb-6">
+          <label
+            className="block text-grey-darker text-sm font-bold mb-2"
+            htmlFor="password"
+          >
+            Password
+          </label>
+          <input
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-grey-darker mb-3"
+            id="password"
+            type="password"
+            placeholder="******************"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
+        <div className="flex items-center justify-between">
+          <button
+            className="bg-blue-500 hover:bg-blue-dark text-white font-bold py-2 px-4 rounded"
+            type="button"
+          >
+            Login
+          </button>
+          <button
+            className="inline-block align-baseline font-bold text-sm text-blue hover:text-blue-darker"
+            onClick={() => history("/change-password")}
+          >
+            Change Password
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
 
-export default Login;
+export default Test;

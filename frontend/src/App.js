@@ -1,11 +1,12 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import Administrator from "./pages/Administrator";
-import Doctor from './pages/Doctor';
-import ChangePassword from './pages/ChangePassword';
-import UpdatePassword from './pages/UpdatePassword';
-import StartPage from "./pages/StartPage"
-import Pacient from "./pages/Pacient"
+import Doctor from "./pages/Doctor";
+import ChangePassword from "./pages/ChangePassword";
+import UpdatePassword from "./pages/UpdatePassword";
+import StartPage from "./pages/StartPage";
+import Pacient from "./pages/Pacient";
+import Test from "./pages/Test";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route exact path="/pacient/:id" element={<Pacient />} />
         <Route exact path="/change-password" element={<ChangePassword />} />
         <Route exact path="/update-password" element={<UpdatePassword />} />
+        <Route exact path="/test" element={<Test />} />
       </Routes>
     </Router>
   );

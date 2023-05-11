@@ -150,26 +150,6 @@ const Administrator = () => {
     }
   };
 
-  const handleRoleChange = async (userId, event) => {
-    const role = event.target.value;
-    try {
-      const response = await fetch(
-        `http://localhost:5000/api/update-user-role/${userId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ role }),
-        }
-      );
-      const data = await response.json();
-      fetchUsers();
-    } catch (error) {
-      console.log(error);
-    }
-  };
   function getNonNullId(user) {
     for (const key in user) {
       if (key.startsWith("id_") && user[key] !== null) {
@@ -220,14 +200,13 @@ const Administrator = () => {
                   <CustomTableCell>ID</CustomTableCell>
                   <CustomTableCell>Name</CustomTableCell>
                   <CustomTableCell>Email</CustomTableCell>
-                  <CustomTableCell>Role</CustomTableCell>
+                  <CustomTableCell>Rol</CustomTableCell>
                   <CustomTableCell>Action</CustomTableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {users.map((user) => (
                   <CustomTableRow key={getNonNullId(user).email}>
-                    {console.log(getNonNullId(user).role)}
                     <CustomTableCell>
                       {getNonNullId(user).userId}
                     </CustomTableCell>
@@ -235,20 +214,7 @@ const Administrator = () => {
                     <CustomTableCell>
                       {getNonNullId(user).email}
                     </CustomTableCell>
-                    <CustomTableCell>
-                      <Select
-                        value={getNonNullId(user).role}
-                        onChange={(event) =>
-                          handleRoleChange(getNonNullId(user).userId, event)
-                        }
-                      >
-                        <MenuItem value="Doctor">Doctor</MenuItem>
-                        <MenuItem value="Pacient">Pacient</MenuItem>
-                        <MenuItem value="Administrator">Administrator</MenuItem>
-                        <MenuItem value="Supraveghetor">Supraveghetor</MenuItem>
-                        <MenuItem value="Ingrijitor">Ingrijitor</MenuItem>
-                      </Select>
-                    </CustomTableCell>
+                    <CustomTableCell>{getNonNullId(user).role}</CustomTableCell>
                     <CustomTableCell>
                       <Button
                         variant="outlined"
