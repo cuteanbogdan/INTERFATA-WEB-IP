@@ -31,17 +31,31 @@ import { Link } from "react-router-dom";
 import PacientForm from "./PacientForm";
 import useAuthRoles from "../utils/useAuthRoles";
 
-const initialFormData = {
-  name: "",
-  age: "",
-  gender: "",
-  medicalCondition: "",
-  alarmParameters: {
-    heartRate: "",
-    bloodPressure: "",
-    temperature: "",
-  },
+const dateMedicale = {
+  antecedente: "",
+  istoricConsultatii: "",
+  urmatoareaConsultatie: "",
+  alergii: "",
+  afectiuniCronice: "",
+  diagnosticCurent: "",
+  diagnosticIstoric: "",
+  medicatieCurenta: "",
+  medicatieIstoric: "",
 };
+
+const datePacient = {
+  cnp: "",
+  nume: "",
+  prenume: "",
+  adresa: "",
+  nr_tel: "",
+  nr_tel_pers_contact: "",
+  email: "",
+  profesie: "",
+  loc_munca: "",
+  varsta: "",
+};
+
 const toastOptions = {
   position: "bottom-right",
   autoClose: 5000,
@@ -61,7 +75,8 @@ const Doctor = () => {
   const [open, setOpen] = useState(false);
   const [openCreate, setOpenCreate] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState(null);
-  const [formData, setFormData] = useState(initialFormData);
+  const [formDateMedicale, setFormDateMedicale] = useState(dateMedicale);
+  const [formDatePacient, setFormDatePacient] = useState(datePacient);
   const history = useNavigate();
   const { authenticated, loading, userRole } = useAuthRoles([
     "Administrator",
@@ -142,6 +157,7 @@ const Doctor = () => {
 
   const handleEdit = (patient) => {
     setSelectedPatient(patient);
+    fetchPatientDetails(patient.id_pacient);
     setOpen(true);
   };
 
@@ -174,25 +190,75 @@ const Doctor = () => {
     }
   };
   const handleFormChange = (event) => {
-    // const { name, value } = event.target;
-    // setFormData({
-    //   ...formData,
-    //   [name]: value,
-    // });
+    const { name, value } = event.target;
+    setFormDateMedicale({
+      ...formDateMedicale,
+      [name]: value,
+    });
+  };
+  const handleFormDatePacient = (event) => {
+    const { name, value } = event.target;
+    setFormDatePacient({
+      ...formDatePacient,
+      [name]: value,
+    });
   };
 
-  const handleAlarmChange = (event) => {
-    // const { name, value } = event.target;
-    // setFormData({
-    //   ...formData,
-    //   alarmParameters: {
-    //     ...formData.alarmParameters,
-    //     [name]: value,
-    //   },
-    // });
+  const updatePatientDetails = async (id) => {
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/update-pacient-details/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formDatePacient),
+        }
+      );
+      const data = await response.json();
+
+      if (data.error) {
+        throw new Error(data.msg);
+      }
+
+      console.log("Patient details updated successfully");
+    } catch (error) {
+      console.error(`Failed to update patient details: ${error}`);
+    }
   };
 
-  const handleFormSubmit = async (event) => {
+  const fetchPatientDetails = async (id) => {
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/get-pacient-details/${id}`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const data = await response.json();
+      let newFormData = { ...formDatePacient }; // create a copy of the current form data
+      for (const key in data.data) {
+        if (newFormData.hasOwnProperty(key)) {
+          newFormData[key] = data.data[key];
+        }
+      }
+
+      setFormDatePacient(newFormData);
+    } catch (error) {
+      console.error(`Failed to fetch patient details: ${error}`);
+    }
+  };
+  const handleSubmitPatientsDetails = (event) => {
+    event.preventDefault();
+    updatePatientDetails(selectedPatient.id_pacient);
+  };
+
+  const handleSubmitDateMedicale = async (event) => {
     // event.preventDefault();
     // try {
     //   await fetch(`/api/patients/${selectedPatient.id}`, {
@@ -334,79 +400,213 @@ const Doctor = () => {
               Edit Patient
             </Typography>
             <Divider sx={{ mt: 1, mb: 2 }} />
-            <form onSubmit={handleFormSubmit}>
+            <form onSubmit={handleSubmitPatientsDetails}>
               <TextField
-                name="name"
-                label="Name"
+                name="cnp"
+                label="CNP"
                 variant="outlined"
+                margin="normal"
                 fullWidth
-                value={formData.name}
-                onChange={handleFormChange}
-                sx={{ mb: 2 }}
+                required
+                value={formDatePacient.cnp}
+                onChange={handleFormDatePacient}
               />
               <TextField
-                name="age"
-                label="Age"
+                name="nume"
+                label="Nume"
                 variant="outlined"
+                margin="normal"
                 fullWidth
-                value={formData.age}
-                onChange={handleFormChange}
-                sx={{ mb: 2 }}
+                required
+                value={formDatePacient.nume}
+                onChange={handleFormDatePacient}
               />
-              <FormControl variant="outlined" fullWidth sx={{ mb: 2 }}>
-                <InputLabel>Gender</InputLabel>
-                <Select
-                  name="gender"
-                  label="Gender"
-                  value={formData.gender}
-                  onChange={handleFormChange}
-                >
-                  <MenuItem value="male">Male</MenuItem>
-                  <MenuItem value="female">Female</MenuItem>
-                  <MenuItem value="other">Other</MenuItem>
-                </Select>
-              </FormControl>
               <TextField
-                name="medicalCondition"
-                label="Medical Condition"
+                name="prenume"
+                label="Prenume"
                 variant="outlined"
+                margin="normal"
                 fullWidth
-                value={formData.medicalCondition}
-                onChange={handleFormChange}
-                sx={{ mb: 2 }}
+                value={formDatePacient.prenume}
+                onChange={handleFormDatePacient}
               />
+              <TextField
+                name="varsta"
+                label="Varsta"
+                variant="outlined"
+                margin="normal"
+                fullWidth
+                multiline
+                value={formDatePacient.varsta}
+                onChange={formDatePacient.handleFormDatePacient}
+              />
+              <TextField
+                name="adresa"
+                variant="outlined"
+                margin="normal"
+                fullWidth
+                required
+                value={formDatePacient.adresa}
+                onChange={handleFormDatePacient}
+              />
+              <TextField
+                name="nr_tel"
+                variant="outlined"
+                margin="normal"
+                fullWidth
+                multiline
+                value={formDatePacient.nr_tel}
+                onChange={handleFormDatePacient}
+              />
+              <TextField
+                name="nr_tel_pers_contact"
+                label="Numar telefon persoana de contact"
+                variant="outlined"
+                margin="normal"
+                fullWidth
+                required
+                value={formDatePacient.nr_tel_pers_contact}
+                onChange={handleFormDatePacient}
+              />
+              <TextField
+                name="email"
+                label="Email"
+                variant="outlined"
+                margin="normal"
+                fullWidth
+                required
+                value={formDatePacient.email}
+                onChange={handleFormDatePacient}
+              />
+              <TextField
+                name="profesie"
+                label="Profesie"
+                variant="outlined"
+                margin="normal"
+                fullWidth
+                required
+                value={formDatePacient.profesie}
+                onChange={handleFormDatePacient}
+              />
+              <TextField
+                name="loc_munca"
+                label="Loc de munca"
+                variant="outlined"
+                margin="normal"
+                fullWidth
+                required
+                value={formDatePacient.loc_munca}
+                onChange={handleFormDatePacient}
+              />
+              <Button variant="contained" color="primary" type="submit">
+                Save
+              </Button>
+            </form>
+
+            <form onSubmit={handleSubmitDateMedicale}>
               <Typography variant="h5" gutterBottom>
-                Alarm Parameters
+                Date medicale
               </Typography>
               <Divider sx={{ mt: 1, mb: 2 }} />
               <TextField
-                name="heartRate"
+                name="antecedente"
                 label="
-                Heart Rate"
+                Antecedente"
                 variant="outlined"
                 fullWidth
-                value={formData.heartRate}
+                value={formDateMedicale.antecedente}
                 onChange={handleFormChange}
                 sx={{ mb: 2 }}
               />
               <TextField
-                name="oxygenLevel"
-                label="Oxygen Level"
+                name="istoricConsultatii"
+                label="
+                Istoric consultatii"
                 variant="outlined"
                 fullWidth
-                value={formData.oxygenLevel}
+                value={formDateMedicale.istoricConsultatii}
+                onChange={handleFormChange}
+                sx={{ mb: 2 }}
+              />
+              <TextField
+                name="urmatoareaConsultatie"
+                label="
+                Urmatoarea consultatie"
+                variant="outlined"
+                fullWidth
+                value={formDateMedicale.urmatoareaConsultatie}
+                onChange={handleFormChange}
+                sx={{ mb: 2 }}
+              />
+              <TextField
+                name="alergii"
+                label="
+                Alergii"
+                variant="outlined"
+                fullWidth
+                value={formDateMedicale.alergii}
+                onChange={handleFormChange}
+                sx={{ mb: 2 }}
+              />
+              <TextField
+                name="afectiuniCronice"
+                label="
+                Afectiuni cronice"
+                variant="outlined"
+                fullWidth
+                value={formDateMedicale.afectiuniCronice}
+                onChange={handleFormChange}
+                sx={{ mb: 2 }}
+              />
+              <TextField
+                name="diagnosticCurent"
+                label="
+                Diagnostic curent"
+                variant="outlined"
+                fullWidth
+                value={formDateMedicale.diagnosticCurent}
+                onChange={handleFormChange}
+                sx={{ mb: 2 }}
+              />
+              <TextField
+                name="diagnosticIstoric"
+                label="
+                Diagnostic istoric"
+                variant="outlined"
+                fullWidth
+                value={formDateMedicale.diagnosticIstoric}
+                onChange={handleFormChange}
+                sx={{ mb: 2 }}
+              />
+              <TextField
+                name="medicatieCurenta"
+                label="
+                Medicatie curenta"
+                variant="outlined"
+                fullWidth
+                value={formDateMedicale.medicatieCurenta}
+                onChange={handleFormChange}
+                sx={{ mb: 2 }}
+              />
+              <TextField
+                name="medicatieIstoric"
+                label="
+                Medicatie istoric"
+                variant="outlined"
+                fullWidth
+                value={formDateMedicale.medicatieIstoric}
                 onChange={handleFormChange}
                 sx={{ mb: 2 }}
               />
               <Button variant="contained" color="primary" type="submit">
                 Save
-              </Button>{" "}
+              </Button>
               <Button
                 variant="contained"
                 onClick={() => {
                   setOpen(false);
                   setSelectedPatient(null);
-                  setFormData(initialFormData);
+                  setFormDateMedicale(formDateMedicale);
                 }}
               >
                 Cancel
