@@ -9,8 +9,14 @@ import {
   Box,
 } from "@mui/material";
 import { toast } from "react-toastify";
+import PacientForm from "./PacientForm";
 
-const UserForm = ({ fetchUsers, toastOptions }) => {
+const UserForm = ({
+  fetchUsers,
+  toastOptions,
+  ingrijitori,
+  supraveghetori,
+}) => {
   const [rol, setRol] = useState("Administrator");
   const token = localStorage.getItem("token");
 
@@ -25,7 +31,10 @@ const UserForm = ({ fetchUsers, toastOptions }) => {
   const [loc_munca, setLoc_munca] = useState("");
   const [password, setPassword] = useState("");
   const [varsta, setVarsta] = useState("");
-
+  const [supraveghetorId, setSupraveghetorId] = useState(
+    "Select Supraveghetor"
+  );
+  const [ingrijitorId, setIngrijitorId] = useState("Select Ingrijitor");
   const handleUserTypeChange = (event) => {
     setRol(event.target.value);
   };
@@ -48,6 +57,8 @@ const UserForm = ({ fetchUsers, toastOptions }) => {
         profesie,
         loc_munca,
         varsta,
+        supraveghetorId,
+        ingrijitorId,
       };
     }
     return baseRequestBody;
@@ -324,6 +335,38 @@ const UserForm = ({ fetchUsers, toastOptions }) => {
                 type="password"
                 onChange={(e) => setPassword(e.target.value)}
               />
+              <Select
+                value={supraveghetorId}
+                onChange={(e) => setSupraveghetorId(e.target.value)}
+                fullWidth
+                sx={{ width: "200%" }}
+                margin="normal"
+              >
+                {supraveghetori.map((supraveghetor) => (
+                  <MenuItem
+                    key={supraveghetor.id_supraveghetor}
+                    value={supraveghetor.id_supraveghetor}
+                  >
+                    {supraveghetor.nume}
+                  </MenuItem>
+                ))}
+              </Select>
+              <Select
+                value={ingrijitorId}
+                onChange={(e) => setIngrijitorId(e.target.value)}
+                fullWidth
+                sx={{ width: "200%" }}
+                margin="normal"
+              >
+                {ingrijitori.map((ingrijitor) => (
+                  <MenuItem
+                    key={ingrijitor.id_ingrijitor}
+                    value={ingrijitor.id_ingrijitor}
+                  >
+                    {ingrijitor.nume}
+                  </MenuItem>
+                ))}
+              </Select>
             </>
           )}
           {rol === "Ingrijitor" && (

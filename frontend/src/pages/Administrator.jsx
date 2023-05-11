@@ -48,6 +48,8 @@ const CustomTableRow = styled(TableRow)(({ theme }) => ({
 
 const Administrator = () => {
   const [users, setUsers] = useState([]);
+  const [supraveghetori, setSupraveghetori] = useState([]);
+  const [ingrijitori, setIngrijitori] = useState([]);
   const [open, setOpen] = useState(false);
   const history = useNavigate();
   const token = localStorage.getItem("token");
@@ -66,9 +68,46 @@ const Administrator = () => {
       console.log(error);
     }
   };
+  const fetchSupraveghetori = async () => {
+    try {
+      const response = await fetch(
+        "http://localhost:5000/api/getallsupraveghetori",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const data = await response.json();
+      setSupraveghetori(data.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const fetchIngrijitori = async () => {
+    try {
+      const response = await fetch(
+        "http://localhost:5000/api/getallingrijitori",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const data = await response.json();
+      setIngrijitori(data.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
   useEffect(() => {
     fetchUsers();
-  }, []);
+    fetchSupraveghetori();
+    fetchIngrijitori();
+  }, [users]);
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -251,7 +290,12 @@ const Administrator = () => {
       <Dialog open={open} onClose={() => setOpen(false)}>
         <DialogTitle>Create User</DialogTitle>
         <DialogContent>
-          <UserForm fetchUsers={fetchUsers} toastOptions={toastOptions} />
+          <UserForm
+            ingrijitori={ingrijitori}
+            supraveghetori={supraveghetori}
+            fetchUsers={fetchUsers}
+            toastOptions={toastOptions}
+          />
         </DialogContent>
       </Dialog>
     </Box>

@@ -56,6 +56,8 @@ const toastOptions = {
 const Doctor = () => {
   const token = localStorage.getItem("token");
   const [patients, setPatients] = useState([]);
+  const [supraveghetori, setSupraveghetori] = useState([]);
+  const [ingrijitori, setIngrijitori] = useState([]);
   const [open, setOpen] = useState(false);
   const [openCreate, setOpenCreate] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState(null);
@@ -77,7 +79,42 @@ const Doctor = () => {
       });
       const data = await response.json();
       setPatients(data.data);
-      console.log(patients);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const fetchSupraveghetori = async () => {
+    try {
+      const response = await fetch(
+        "http://localhost:5000/api/getallsupraveghetori",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const data = await response.json();
+      setSupraveghetori(data.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const fetchIngrijitori = async () => {
+    try {
+      const response = await fetch(
+        "http://localhost:5000/api/getallingrijitori",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const data = await response.json();
+      setIngrijitori(data.data);
     } catch (error) {
       console.log(error);
     }
@@ -85,7 +122,10 @@ const Doctor = () => {
 
   useEffect(() => {
     fetchPatients();
+    fetchSupraveghetori();
+    fetchIngrijitori();
   }, []);
+
   const logoutUser = () => {
     localStorage.removeItem("token");
     history("/login");
@@ -384,6 +424,8 @@ const Doctor = () => {
         <DialogTitle>Create New Patient</DialogTitle>
         <DialogContent>
           <PacientForm
+            ingrijitori={ingrijitori}
+            supraveghetori={supraveghetori}
             fetchPatients={fetchPatients}
             toastOptions={toastOptions}
           />
