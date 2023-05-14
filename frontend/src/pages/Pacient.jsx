@@ -3,25 +3,31 @@ import { useParams } from "react-router-dom";
 import {
   Container,
   Typography,
-  Paper,
   Box,
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
-  Card,
-  CardContent,
   Grid,
   Avatar,
+  Card,
+  CardContent,
+  Chip,
 } from "@mui/material";
 import useAuthRoles from "../utils/useAuthRoles";
 import { useNavigate } from "react-router-dom";
 import { styled } from "@mui/system";
-
-const StyledPaper = styled(Paper)(({ theme }) => ({
-  padding: theme.spacing(3),
-  borderRadius: "15px",
+import CardHeader from "@mui/material/CardHeader";
+import IconButton from "@mui/material/IconButton";
+import EditIcon from "@mui/icons-material/Edit";
+const StyledAvatar = styled(Avatar)(({ theme }) => ({
+  backgroundColor: theme.palette.primary.main,
+  marginRight: theme.spacing(2),
 }));
+
+const StyledCard = styled(Card)(({ theme }) => ({
+  marginBottom: theme.spacing(2),
+  padding: theme.spacing(2),
+  borderRadius: "15px",
+  backgroundColor: theme.palette.grey[100],
+}));
+
 const Patient = () => {
   const [pacientData, setPacientData] = useState(null);
   const token = localStorage.getItem("token");
@@ -34,7 +40,7 @@ const Patient = () => {
   const { id } = useParams();
   const fetchPatient = async () => {
     try {
-      const response = await fetch(
+      const responsePacient = await fetch(
         `http://localhost:5000/api/get-pacient-details/${id}`,
         {
           method: "POST",
@@ -43,11 +49,22 @@ const Patient = () => {
           },
         }
       );
-      const data = await response.json();
-      console.log(data.data);
-      setPacientData(data.data);
+      const dataPacient = await responsePacient.json();
+
+      const responseMedicale = await fetch(
+        `http://localhost:5000/api/get-date-medicale-patient/${dataPacient.data.id_medical}`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const dataMedicale = await responseMedicale.json();
+
+      setPacientData({ ...dataPacient.data, ...dataMedicale.data });
     } catch (error) {
-      console.error("Error fetching patient data:", error);
+      console.error("Error fetching data:", error);
     }
   };
   useEffect(() => {
@@ -69,58 +86,124 @@ const Patient = () => {
     <Container maxWidth="md">
       <Grid container spacing={3}>
         <Grid item xs={12}>
-          <StyledPaper>
-            <Box display="flex" alignItems="center">
-              <Avatar>{pacientData.nume.charAt(0)}</Avatar>
-              <Box ml={2}>
-                <Typography variant="h5" gutterBottom>
-                  {pacientData.nume} {pacientData.prenume}
-                </Typography>
-                <Typography variant="subtitle1">{pacientData.rol}</Typography>
-              </Box>
-            </Box>
-          </StyledPaper>
+          <StyledCard>
+            <CardHeader
+              avatar={<StyledAvatar>{pacientData.nume.charAt(0)}</StyledAvatar>}
+              action={
+                <IconButton>
+                  <EditIcon />
+                </IconButton>
+              }
+              title={`${pacientData.nume} ${pacientData.prenume}`}
+              subheader={pacientData.rol}
+            />
+          </StyledCard>
         </Grid>
 
         <Grid item xs={12} sm={6}>
-          <StyledPaper>
-            <Typography variant="h6" gutterBottom>
-              Personal Details
-            </Typography>
-            <Typography>
-              <strong>CNP:</strong> {pacientData.cnp}
-            </Typography>
-            <Typography>
-              <strong>Adresa:</strong> {pacientData.adresa}
-            </Typography>
-            <Typography>
-              <strong>Nr. Tel:</strong> {pacientData.nr_tel}
-            </Typography>
-            <Typography>
-              <strong>Nr. Tel Pers. Contact:</strong>{" "}
-              {pacientData.nr_tel_pers_contact}
-            </Typography>
-          </StyledPaper>
+          <StyledCard>
+            <CardHeader
+              title="Personal Details"
+              titleTypographyProps={{ variant: "h6" }}
+            />
+            <CardContent>
+              <Typography>
+                <strong>CNP:</strong> {pacientData.cnp}
+              </Typography>
+              <Typography>
+                <strong>Adresa:</strong> {pacientData.adresa}
+              </Typography>
+              <Typography>
+                <strong>Nr. Tel:</strong> {pacientData.nr_tel}
+              </Typography>
+              <Typography>
+                <strong>Nr. Tel Pers. Contact:</strong>{" "}
+                {pacientData.nr_tel_pers_contact}
+              </Typography>
+            </CardContent>
+          </StyledCard>
         </Grid>
 
         <Grid item xs={12} sm={6}>
-          <StyledPaper>
-            <Typography variant="h6" gutterBottom>
-              Work & Education
-            </Typography>
-            <Typography>
-              <strong>Email:</strong> {pacientData.email}
-            </Typography>
-            <Typography>
-              <strong>Profesie:</strong> {pacientData.profesie}
-            </Typography>
-            <Typography>
-              <strong>Loc Munca:</strong> {pacientData.loc_munca}
-            </Typography>
-            <Typography>
-              <strong>Varsta:</strong> {pacientData.varsta}
-            </Typography>
-          </StyledPaper>
+          <StyledCard>
+            <CardHeader
+              title="Work & Education"
+              titleTypographyProps={{ variant: "h6" }}
+            />
+            <CardContent>
+              <Typography>
+                <strong>Email:</strong> {pacientData.email}
+              </Typography>
+              <Typography>
+                <strong>Profesie:</strong> {pacientData.profesie}
+              </Typography>
+              <Typography>
+                <strong>Loc Munca:</strong> {pacientData.loc_munca}
+              </Typography>
+              <Typography>
+                <strong>Varsta:</strong> {pacientData.varsta}
+              </Typography>
+            </CardContent>
+          </StyledCard>
+        </Grid>
+
+        <Grid item xs={12} sm={6}>
+          <StyledCard>
+            <CardHeader
+              title="Medical Details"
+              titleTypographyProps={{ variant: "h6" }}
+            />
+            <CardContent>
+              <Typography>
+                <strong>Antecedente:</strong> {pacientData.antcedente}
+              </Typography>
+              <Typography>
+                <strong>Istoric Consultatii:</strong>{" "}
+                {pacientData.istoric_consultatii}
+              </Typography>
+              <Typography>
+                <strong>Urmatoarea Consultatie:</strong>{" "}
+                {pacientData.urmatoarea_consultatie}
+              </Typography>
+              <Typography>
+                <strong>Alergii:</strong> {pacientData.alergii}
+              </Typography>
+              <Typography>
+                <strong>Afectiuni Cronice:</strong>{" "}
+                {pacientData.afectiuni_cronice}
+              </Typography>
+              <Typography>
+                <strong>Diagnostic Curent:</strong>{" "}
+                {pacientData.diagnostic_curent}
+              </Typography>
+              <Typography>
+                <strong>Diagnostic Istoric:</strong>{" "}
+                {pacientData.diagnostic_istoric}
+              </Typography>
+              <Typography>
+                <strong>Medicatie Curenta:</strong>{" "}
+                {pacientData.medicatie_curenta}
+              </Typography>
+              <Typography>
+                <strong>Medicatie Istoric:</strong>{" "}
+                {pacientData.medicatie_istoric}
+              </Typography>
+            </CardContent>
+          </StyledCard>
+        </Grid>
+
+        <Grid item xs={12}>
+          <StyledCard>
+            <CardHeader
+              title="Additional Information"
+              titleTypographyProps={{ variant: "h6" }}
+            />
+            <CardContent>
+              <Typography>
+                <strong>Other details:</strong> {pacientData.additional_details}
+              </Typography>
+            </CardContent>
+          </StyledCard>
         </Grid>
       </Grid>
     </Container>
