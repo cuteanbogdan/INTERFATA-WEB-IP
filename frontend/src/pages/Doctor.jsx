@@ -32,15 +32,15 @@ import PacientForm from "./PacientForm";
 import useAuthRoles from "../utils/useAuthRoles";
 
 const dateMedicale = {
-  antecedente: "",
-  istoricConsultatii: "",
-  urmatoareaConsultatie: "",
+  antcedente: "",
+  istoric_consultatii: "",
+  urmatoarea_consultatie: "",
   alergii: "",
-  afectiuniCronice: "",
-  diagnosticCurent: "",
-  diagnosticIstoric: "",
-  medicatieCurenta: "",
-  medicatieIstoric: "",
+  afectiuni_cronice: "",
+  diagnostic_curent: "",
+  diagnostic_istoric: "",
+  medicatie_curenta: "",
+  medicatie_istoric: "",
 };
 
 const datePacient = {
@@ -158,6 +158,7 @@ const Doctor = () => {
   const handleEdit = (patient) => {
     setSelectedPatient(patient);
     fetchPatientDetails(patient.id_pacient);
+    fetchDateMedicalePatient(patient.id_medical);
     setOpen(true);
   };
 
@@ -229,6 +230,31 @@ const Doctor = () => {
     }
   };
 
+  const updateDateMedicalePatient = async (id) => {
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/update-date-medicale/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formDateMedicale),
+        }
+      );
+      const data = await response.json();
+
+      if (data.error) {
+        throw new Error(data.msg);
+      }
+
+      console.log("Medical patient data updated successfully");
+    } catch (error) {
+      console.error(`Failed to update medical patient data: ${error}`);
+    }
+  };
+
   const fetchPatientDetails = async (id) => {
     try {
       const response = await fetch(
@@ -253,44 +279,40 @@ const Doctor = () => {
       console.error(`Failed to fetch patient details: ${error}`);
     }
   };
+
+  const fetchDateMedicalePatient = async (id) => {
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/get-date-medicale-patient/${id}`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const data = await response.json();
+      console.log(data);
+      let newFormData = { ...formDateMedicale }; // create a copy of the current form data
+      for (const key in data.data) {
+        if (newFormData.hasOwnProperty(key)) {
+          newFormData[key] = data.data[key];
+        }
+      }
+      setFormDateMedicale(newFormData);
+    } catch (error) {
+      console.error(`Failed to fetch medical data: ${error}`);
+    }
+  };
+
   const handleSubmitPatientsDetails = (event) => {
     event.preventDefault();
     updatePatientDetails(selectedPatient.id_pacient);
   };
 
-  const handleSubmitDateMedicale = async (event) => {
-    // event.preventDefault();
-    // try {
-    //   await fetch(`/api/patients/${selectedPatient.id}`, {
-    //     method: "PUT",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify(formData),
-    //   });
-    //   setPatients(
-    //     patients.map((patient) => {
-    //       if (patient.id === selectedPatient.id) {
-    //         return {
-    //           ...patient,
-    //           name: formData.name,
-    //           age: formData.age,
-    //           gender: formData.gender,
-    //           medicalCondition: formData.medicalCondition,
-    //           alarmParameters: {
-    //             heartRate: formData.alarmParameters.heartRate,
-    //             bloodPressure: formData.alarmParameters.bloodPressure,
-    //             temperature: formData.alarmParameters.temperature,
-    //           },
-    //         };
-    //       }
-    //       return patient;
-    //     })
-    //   );
-    //   setOpen(false);
-    // } catch (error) {
-    //   console.log(error);
-    // }
+  const handleSubmitDateMedicalePatient = (event) => {
+    event.preventDefault();
+    updateDateMedicalePatient(selectedPatient.id_medical);
   };
 
   const handleView = (patient) => {
@@ -442,15 +464,16 @@ const Doctor = () => {
               />
               <TextField
                 name="adresa"
+                label="Adresa"
                 variant="outlined"
                 margin="normal"
                 fullWidth
-                required
                 value={formDatePacient.adresa}
                 onChange={handleFormDatePacient}
               />
               <TextField
                 name="nr_tel"
+                label="Numar de telefon"
                 variant="outlined"
                 margin="normal"
                 fullWidth
@@ -464,7 +487,6 @@ const Doctor = () => {
                 variant="outlined"
                 margin="normal"
                 fullWidth
-                required
                 value={formDatePacient.nr_tel_pers_contact}
                 onChange={handleFormDatePacient}
               />
@@ -503,38 +525,38 @@ const Doctor = () => {
               </Button>
             </form>
 
-            <form onSubmit={handleSubmitDateMedicale}>
+            <form onSubmit={handleSubmitDateMedicalePatient}>
               <Typography variant="h5" gutterBottom>
                 Date medicale
               </Typography>
               <Divider sx={{ mt: 1, mb: 2 }} />
               <TextField
-                name="antecedente"
+                name="antcedente"
                 label="
                 Antecedente"
                 variant="outlined"
                 fullWidth
-                value={formDateMedicale.antecedente}
+                value={formDateMedicale.antcedente}
                 onChange={handleFormChange}
                 sx={{ mb: 2 }}
               />
               <TextField
-                name="istoricConsultatii"
+                name="istoric_consultatii"
                 label="
                 Istoric consultatii"
                 variant="outlined"
                 fullWidth
-                value={formDateMedicale.istoricConsultatii}
+                value={formDateMedicale.istoric_consultatii}
                 onChange={handleFormChange}
                 sx={{ mb: 2 }}
               />
               <TextField
-                name="urmatoareaConsultatie"
+                name="urmatoarea_consultatie"
                 label="
                 Urmatoarea consultatie"
                 variant="outlined"
                 fullWidth
-                value={formDateMedicale.urmatoareaConsultatie}
+                value={formDateMedicale.urmatoarea_consultatie}
                 onChange={handleFormChange}
                 sx={{ mb: 2 }}
               />
@@ -549,52 +571,52 @@ const Doctor = () => {
                 sx={{ mb: 2 }}
               />
               <TextField
-                name="afectiuniCronice"
+                name="afectiuni_cronice"
                 label="
                 Afectiuni cronice"
                 variant="outlined"
                 fullWidth
-                value={formDateMedicale.afectiuniCronice}
+                value={formDateMedicale.afectiuni_cronice}
                 onChange={handleFormChange}
                 sx={{ mb: 2 }}
               />
               <TextField
-                name="diagnosticCurent"
+                name="diagnostic_curent"
                 label="
                 Diagnostic curent"
                 variant="outlined"
                 fullWidth
-                value={formDateMedicale.diagnosticCurent}
+                value={formDateMedicale.diagnostic_curent}
                 onChange={handleFormChange}
                 sx={{ mb: 2 }}
               />
               <TextField
-                name="diagnosticIstoric"
+                name="diagnostic_istoric"
                 label="
                 Diagnostic istoric"
                 variant="outlined"
                 fullWidth
-                value={formDateMedicale.diagnosticIstoric}
+                value={formDateMedicale.diagnostic_istoric}
                 onChange={handleFormChange}
                 sx={{ mb: 2 }}
               />
               <TextField
-                name="medicatieCurenta"
+                name="medicatie_curenta"
                 label="
                 Medicatie curenta"
                 variant="outlined"
                 fullWidth
-                value={formDateMedicale.medicatieCurenta}
+                value={formDateMedicale.medicatie_curenta}
                 onChange={handleFormChange}
                 sx={{ mb: 2 }}
               />
               <TextField
-                name="medicatieIstoric"
+                name="medicatie_istoric"
                 label="
                 Medicatie istoric"
                 variant="outlined"
                 fullWidth
-                value={formDateMedicale.medicatieIstoric}
+                value={formDateMedicale.medicatie_istoric}
                 onChange={handleFormChange}
                 sx={{ mb: 2 }}
               />

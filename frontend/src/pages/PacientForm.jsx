@@ -29,10 +29,8 @@ const PacientForm = ({
   const [loc_munca, setLoc_munca] = useState("");
   const [password, setPassword] = useState("");
   const [varsta, setVarsta] = useState("");
-  const [supraveghetorId, setSupraveghetorId] = useState(
-    "Select Supraveghetor"
-  );
-  const [ingrijitorId, setIngrijitorId] = useState("Select Ingrijitor");
+  const [supraveghetorId, setSupraveghetorId] = useState("");
+  const [ingrijitorId, setIngrijitorId] = useState("");
 
   const rol = "Pacient";
 
