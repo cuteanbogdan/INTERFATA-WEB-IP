@@ -41,7 +41,7 @@ const Patient = () => {
   const fetchPatient = async () => {
     try {
       const responsePacient = await fetch(
-        `http://localhost:5000/api/get-pacient-details/${id}`,
+        `https://server-ip2023.herokuapp.com/api/get-pacient-details/${id}`,
         {
           method: "POST",
           headers: {
@@ -52,7 +52,7 @@ const Patient = () => {
       const dataPacient = await responsePacient.json();
 
       const responseMedicale = await fetch(
-        `http://localhost:5000/api/get-date-medicale-patient/${dataPacient.data.id_medical}`,
+        `https://server-ip2023.herokuapp.com/api/get-date-medicale-patient/${dataPacient.data.id_medical}`,
         {
           method: "POST",
           headers: {

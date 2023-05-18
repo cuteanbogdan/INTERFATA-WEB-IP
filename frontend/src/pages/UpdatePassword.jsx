@@ -32,7 +32,7 @@ const UpdatePassword = () => {
     e.preventDefault();
     try {
       const response = await fetch(
-        "http://localhost:5000/email/update-password",
+        "https://server-ip2023.herokuapp.com/email/update-password",
         {
           method: "POST",
           headers: {

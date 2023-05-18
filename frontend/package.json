@@ -45,5 +45,8 @@
   },
   "devDependencies": {
     "tailwindcss": "^3.3.2"
+  },
+  "env": {
+    "GENERATE_SOURCEMAP": "false"
   }
 }

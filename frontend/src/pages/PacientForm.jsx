@@ -38,29 +38,32 @@ const PacientForm = ({
     event.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:5000/api/register", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          rol,
-          cnp,
-          nume,
-          prenume,
-          adresa,
-          nr_tel,
-          nr_tel_pers_contact,
-          email,
-          profesie,
-          loc_munca,
-          password,
-          varsta,
-          supraveghetorId,
-          ingrijitorId,
-        }),
-      });
+      const response = await fetch(
+        "https://server-ip2023.herokuapp.com/api/register",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            rol,
+            cnp,
+            nume,
+            prenume,
+            adresa,
+            nr_tel,
+            nr_tel_pers_contact,
+            email,
+            profesie,
+            loc_munca,
+            password,
+            varsta,
+            supraveghetorId,
+            ingrijitorId,
+          }),
+        }
+      );
 
       if (response.ok) {
         // Handle success
@@ -208,6 +211,7 @@ const PacientForm = ({
               fullWidth
               sx={{ width: "200%" }}
               required
+              type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
