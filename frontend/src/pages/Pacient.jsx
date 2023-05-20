@@ -41,7 +41,7 @@ const Patient = () => {
   const fetchPatient = async () => {
     try {
       const responsePacient = await fetch(
-        `https://server-ip2023.herokuapp.com/api/get-pacient-details/${id}`,
+        `http://localhost:5000/api/get-pacient-details/${id}`,
         {
           method: "POST",
           headers: {
@@ -52,7 +52,7 @@ const Patient = () => {
       const dataPacient = await responsePacient.json();
 
       const responseMedicale = await fetch(
-        `https://server-ip2023.herokuapp.com/api/get-date-medicale-patient/${dataPacient.data.id_medical}`,
+        `http://localhost:5000/api/get-date-medicale-patient/${dataPacient.data.id_medical}`,
         {
           method: "POST",
           headers: {
@@ -60,9 +60,24 @@ const Patient = () => {
           },
         }
       );
-      const dataMedicale = await responseMedicale.json();
 
-      setPacientData({ ...dataPacient.data, ...dataMedicale.data });
+      const responseColectate = await fetch(
+        `http://localhost:5000/api/get-date-colectate-patient/${dataPacient.data.id_colectie}`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const dataMedicale = await responseMedicale.json();
+      const dataColectate = await responseColectate.json();
+      setPacientData({
+        ...dataPacient.data,
+        ...dataMedicale.data,
+        ...dataColectate.data,
+      });
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -187,6 +202,46 @@ const Patient = () => {
               <Typography>
                 <strong>Medicatie Istoric:</strong>{" "}
                 {pacientData.medicatie_istoric}
+              </Typography>
+            </CardContent>
+          </StyledCard>
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <StyledCard>
+            <CardHeader
+              title="Collected Details"
+              titleTypographyProps={{ variant: "h6" }}
+            />
+            <CardContent>
+              <Typography>
+                <strong>Tensiunea arteriala:</strong> {pacientData.TA}
+              </Typography>
+              <Typography>
+                <strong>Glicemie:</strong> {pacientData.glicemie}
+              </Typography>
+              <Typography>
+                <strong>Grad iluminare:</strong> {pacientData.grad_iluminare}
+              </Typography>
+              <Typography>
+                <strong>Greutate:</strong> {pacientData.greutate}
+              </Typography>
+              <Typography>
+                <strong>Proximitate:</strong> {pacientData.proximitate}
+              </Typography>
+              <Typography>
+                <strong>Puls:</strong> {pacientData.puls}
+              </Typography>
+              <Typography>
+                <strong>Saturatie gaz:</strong> {pacientData.saturatie_gaz}
+              </Typography>
+              <Typography>
+                <strong>Temperatura ambianta:</strong> {pacientData.temp_amb}
+              </Typography>
+              <Typography>
+                <strong>Temperatura corp:</strong> {pacientData.temp_corp}
+              </Typography>
+              <Typography>
+                <strong>Umiditate:</strong> {pacientData.umiditate}
               </Typography>
             </CardContent>
           </StyledCard>

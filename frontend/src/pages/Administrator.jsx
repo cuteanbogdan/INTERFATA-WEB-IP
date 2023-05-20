@@ -56,15 +56,12 @@ const Administrator = () => {
   const { authenticated, loading, userRole } = useAuth();
   const fetchUsers = async () => {
     try {
-      const response = await fetch(
-        "https://server-ip2023.herokuapp.com/api/getallusers",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch("http://localhost:5000/api/getallusers", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const data = await response.json();
       setUsers(data.data);
     } catch (error) {
@@ -74,7 +71,7 @@ const Administrator = () => {
   const fetchSupraveghetori = async () => {
     try {
       const response = await fetch(
-        "https://server-ip2023.herokuapp.com/api/getallsupraveghetori",
+        "http://localhost:5000/api/getallsupraveghetori",
         {
           method: "POST",
           headers: {
@@ -92,7 +89,7 @@ const Administrator = () => {
   const fetchIngrijitori = async () => {
     try {
       const response = await fetch(
-        "https://server-ip2023.herokuapp.com/api/getallingrijitori",
+        "http://localhost:5000/api/getallingrijitori",
         {
           method: "POST",
           headers: {
@@ -127,7 +124,7 @@ const Administrator = () => {
   const handleDeleteUser = async (userId) => {
     try {
       const response = await fetch(
-        `https://server-ip2023.herokuapp.com/api/delete-user/${userId}`,
+        `http://localhost:5000/api/delete-user/${userId}`,
         {
           method: "POST",
           headers: {

@@ -56,6 +56,27 @@ const datePacient = {
   varsta: "",
 };
 
+const dateParametrii = {
+  TA_min: "",
+  TA_max: "",
+  puls_min: "",
+  puls_maax: "",
+  temp_corp_min: "",
+  temp_corp_max: "",
+  greutate_min: "",
+  greuatate_max: "",
+  glicemie_min: "",
+  glicemie_max: "",
+  temp_amb_min: "",
+  temp_amb_max: "",
+  saturatie_gaz_min: "",
+  saturatie_gaz_max: "",
+  umiditate_min: "",
+  umiditate_max: "",
+  proximitate_max: "",
+  proximitate_min: "",
+};
+
 const toastOptions = {
   position: "bottom-right",
   autoClose: 5000,
@@ -77,6 +98,7 @@ const Doctor = () => {
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [formDateMedicale, setFormDateMedicale] = useState(dateMedicale);
   const [formDatePacient, setFormDatePacient] = useState(datePacient);
+  const [formDateParametrii, setFormDateParametrii] = useState(dateParametrii);
   const history = useNavigate();
   const { authenticated, loading, userRole } = useAuthRoles([
     "Administrator",
@@ -86,15 +108,12 @@ const Doctor = () => {
   // Fetch patients data from server and set the state
   const fetchPatients = async () => {
     try {
-      const response = await fetch(
-        "https://server-ip2023.herokuapp.com/api/getallpacients",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch("http://localhost:5000/api/getallpacients", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const data = await response.json();
       setPatients(data.data);
     } catch (error) {
@@ -105,7 +124,7 @@ const Doctor = () => {
   const fetchSupraveghetori = async () => {
     try {
       const response = await fetch(
-        "https://server-ip2023.herokuapp.com/api/getallsupraveghetori",
+        "http://localhost:5000/api/getallsupraveghetori",
         {
           method: "POST",
           headers: {
@@ -123,7 +142,7 @@ const Doctor = () => {
   const fetchIngrijitori = async () => {
     try {
       const response = await fetch(
-        "https://server-ip2023.herokuapp.com/api/getallingrijitori",
+        "http://localhost:5000/api/getallingrijitori",
         {
           method: "POST",
           headers: {
@@ -162,13 +181,14 @@ const Doctor = () => {
     setSelectedPatient(patient);
     fetchPatientDetails(patient.id_pacient);
     fetchDateMedicalePatient(patient.id_medical);
+    fetchParametri(patient.id_parametru);
     setOpen(true);
   };
 
   const handleDeletePacient = async (userId) => {
     try {
       const response = await fetch(
-        `https://server-ip2023.herokuapp.com/api/delete-pacient/${userId}`,
+        `http://localhost:5000/api/delete-pacient/${userId}`,
         {
           method: "POST",
           headers: {
@@ -208,10 +228,18 @@ const Doctor = () => {
     });
   };
 
+  const handleDateColectateFormChange = (event) => {
+    const { name, value } = event.target;
+    setFormDateParametrii({
+      ...formDateParametrii,
+      [name]: value,
+    });
+  };
+
   const updatePatientDetails = async (id) => {
     try {
       const response = await fetch(
-        `https://server-ip2023.herokuapp.com/api/update-pacient-details/${id}`,
+        `http://localhost:5000/api/update-pacient-details/${id}`,
         {
           method: "PUT",
           headers: {
@@ -236,7 +264,7 @@ const Doctor = () => {
   const updateDateMedicalePatient = async (id) => {
     try {
       const response = await fetch(
-        `https://server-ip2023.herokuapp.com/api/update-date-medicale/${id}`,
+        `http://localhost:5000/api/update-date-medicale/${id}`,
         {
           method: "PUT",
           headers: {
@@ -258,10 +286,35 @@ const Doctor = () => {
     }
   };
 
+  const updateParametri = async (id) => {
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/update-parametri/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formDateParametrii),
+        }
+      );
+      const data = await response.json();
+
+      if (data.error) {
+        throw new Error(data.msg);
+      }
+
+      console.log("Medical patient data updated successfully");
+    } catch (error) {
+      console.error(`Failed to update medical patient data: ${error}`);
+    }
+  };
+
   const fetchPatientDetails = async (id) => {
     try {
       const response = await fetch(
-        `https://server-ip2023.herokuapp.com/api/get-pacient-details/${id}`,
+        `http://localhost:5000/api/get-pacient-details/${id}`,
         {
           method: "POST",
           headers: {
@@ -282,11 +335,34 @@ const Doctor = () => {
       console.error(`Failed to fetch patient details: ${error}`);
     }
   };
+  const fetchParametri = async (id) => {
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/get-parametri/${id}`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const data = await response.json();
+      let newFormData = { ...formDateParametrii }; // create a copy of the current form data
+      for (const key in data.data) {
+        if (newFormData.hasOwnProperty(key)) {
+          newFormData[key] = data.data[key];
+        }
+      }
 
+      setFormDateParametrii(newFormData);
+    } catch (error) {
+      console.error(`Failed to fetch parametri details: ${error}`);
+    }
+  };
   const fetchDateMedicalePatient = async (id) => {
     try {
       const response = await fetch(
-        `https://server-ip2023.herokuapp.com/api/get-date-medicale-patient/${id}`,
+        `http://localhost:5000/api/get-date-medicale-patient/${id}`,
         {
           method: "POST",
           headers: {
@@ -316,6 +392,11 @@ const Doctor = () => {
   const handleSubmitDateMedicalePatient = (event) => {
     event.preventDefault();
     updateDateMedicalePatient(selectedPatient.id_medical);
+  };
+
+  const handleSubmitDateColectate = (event) => {
+    event.preventDefault();
+    updateParametri(selectedPatient.id_parametru);
   };
 
   const handleView = (patient) => {
@@ -621,6 +702,206 @@ const Doctor = () => {
                 fullWidth
                 value={formDateMedicale.medicatie_istoric}
                 onChange={handleFormChange}
+                sx={{ mb: 2 }}
+              />
+              <Button variant="contained" color="primary" type="submit">
+                Save
+              </Button>
+              <Button
+                variant="contained"
+                onClick={() => {
+                  setOpen(false);
+                  setSelectedPatient(null);
+                  setFormDateMedicale(formDateMedicale);
+                }}
+              >
+                Cancel
+              </Button>
+            </form>
+
+            <form onSubmit={handleSubmitDateColectate}>
+              <Typography variant="h5" gutterBottom>
+                Date colectate
+              </Typography>
+              <Divider sx={{ mt: 1, mb: 2 }} />
+              <TextField
+                name="TA_min"
+                label="
+                Tensiune minima"
+                variant="outlined"
+                fullWidth
+                value={formDateParametrii.TA_min}
+                onChange={handleDateColectateFormChange}
+                sx={{ mb: 2 }}
+              />
+              <TextField
+                name="TA_max"
+                label="
+                Tensiune maxima"
+                variant="outlined"
+                fullWidth
+                value={formDateParametrii.TA_max}
+                onChange={handleDateColectateFormChange}
+                sx={{ mb: 2 }}
+              />
+              <TextField
+                name="puls_min"
+                label="
+                Puls minim"
+                variant="outlined"
+                fullWidth
+                value={formDateParametrii.puls_min}
+                onChange={handleDateColectateFormChange}
+                sx={{ mb: 2 }}
+              />
+              <TextField
+                name="puls_maax"
+                label="
+                Puls maxim"
+                variant="outlined"
+                fullWidth
+                value={formDateParametrii.puls_maax}
+                onChange={handleDateColectateFormChange}
+                sx={{ mb: 2 }}
+              />
+              <TextField
+                name="temp_corp_min"
+                label="
+                Temperatura corp minima"
+                variant="outlined"
+                fullWidth
+                value={formDateParametrii.temp_corp_min}
+                onChange={handleDateColectateFormChange}
+                sx={{ mb: 2 }}
+              />
+              <TextField
+                name="temp_corp_max"
+                label="
+                Temperatura corp maxima"
+                variant="outlined"
+                fullWidth
+                value={formDateParametrii.temp_corp_max}
+                onChange={handleDateColectateFormChange}
+                sx={{ mb: 2 }}
+              />
+              <TextField
+                name="greutate_min"
+                label="
+                Greutate minima"
+                variant="outlined"
+                fullWidth
+                value={formDateParametrii.greutate_min}
+                onChange={handleDateColectateFormChange}
+                sx={{ mb: 2 }}
+              />
+              <TextField
+                name="greuatate_max"
+                label="
+                Greutate maxima"
+                variant="outlined"
+                fullWidth
+                value={formDateParametrii.greuatate_max}
+                onChange={handleDateColectateFormChange}
+                sx={{ mb: 2 }}
+              />
+              <TextField
+                name="glicemie_min"
+                label="
+                Glicemie minima"
+                variant="outlined"
+                fullWidth
+                value={formDateParametrii.glicemie_min}
+                onChange={handleDateColectateFormChange}
+                sx={{ mb: 2 }}
+              />
+              <TextField
+                name="glicemie_max"
+                label="
+                Glicemie maxima"
+                variant="outlined"
+                fullWidth
+                value={formDateParametrii.glicemie_max}
+                onChange={handleDateColectateFormChange}
+                sx={{ mb: 2 }}
+              />
+              <TextField
+                name="temp_amb_min"
+                label="
+                Temperatura ambianta minima"
+                variant="outlined"
+                fullWidth
+                value={formDateParametrii.temp_amb_min}
+                onChange={handleDateColectateFormChange}
+                sx={{ mb: 2 }}
+              />
+              <TextField
+                name="temp_amb_max"
+                label="
+                Temperatura ambianta maxima"
+                variant="outlined"
+                fullWidth
+                value={formDateParametrii.temp_amb_max}
+                onChange={handleDateColectateFormChange}
+                sx={{ mb: 2 }}
+              />
+              <TextField
+                name="saturatie_gaz_min"
+                label="
+                Saturatie gaz minima"
+                variant="outlined"
+                fullWidth
+                value={formDateParametrii.saturatie_gaz_min}
+                onChange={handleDateColectateFormChange}
+                sx={{ mb: 2 }}
+              />
+              <TextField
+                name="saturatie_gaz_max"
+                label="
+                Saturatie gaz maxima"
+                variant="outlined"
+                fullWidth
+                value={formDateParametrii.saturatie_gaz_max}
+                onChange={handleDateColectateFormChange}
+                sx={{ mb: 2 }}
+              />
+              <TextField
+                name="umiditate_min"
+                label="
+                Umiditate minima"
+                variant="outlined"
+                fullWidth
+                value={formDateParametrii.umiditate_min}
+                onChange={handleDateColectateFormChange}
+                sx={{ mb: 2 }}
+              />
+              <TextField
+                name="umiditate_max"
+                label="
+                Umiditate maxima"
+                variant="outlined"
+                fullWidth
+                value={formDateParametrii.umiditate_max}
+                onChange={handleDateColectateFormChange}
+                sx={{ mb: 2 }}
+              />
+              <TextField
+                name="proximitate_min"
+                label="
+                Proximitate minima"
+                variant="outlined"
+                fullWidth
+                value={formDateParametrii.proximitate_min}
+                onChange={handleDateColectateFormChange}
+                sx={{ mb: 2 }}
+              />
+              <TextField
+                name="proximitate_max"
+                label="
+                Proximitate maxima"
+                variant="outlined"
+                fullWidth
+                value={formDateParametrii.proximitate_max}
+                onChange={handleDateColectateFormChange}
                 sx={{ mb: 2 }}
               />
               <Button variant="contained" color="primary" type="submit">
