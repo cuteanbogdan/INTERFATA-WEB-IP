@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 
@@ -12,13 +12,8 @@ import {
   Paper,
   Button,
   Modal,
-  Backdrop,
   Fade,
   TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   Typography,
   Box,
   Divider,
@@ -27,7 +22,6 @@ import {
   DialogContent,
   Grid,
 } from "@mui/material";
-import { Link } from "react-router-dom";
 import PacientForm from "./PacientForm";
 import useAuthRoles from "../utils/useAuthRoles";
 
@@ -100,13 +94,10 @@ const Doctor = () => {
   const [formDatePacient, setFormDatePacient] = useState(datePacient);
   const [formDateParametrii, setFormDateParametrii] = useState(dateParametrii);
   const history = useNavigate();
-  const { authenticated, loading, userRole } = useAuthRoles([
-    "Administrator",
-    "Doctor",
-  ]);
+  const { authenticated, loading } = useAuthRoles(["Administrator", "Doctor"]);
 
   // Fetch patients data from server and set the state
-  const fetchPatients = async () => {
+  const fetchPatients = useCallback(async () => {
     try {
       const response = await fetch("http://localhost:5000/api/getallpacients", {
         method: "POST",
@@ -119,9 +110,9 @@ const Doctor = () => {
     } catch (error) {
       console.log(error);
     }
-  };
+  }, [token]);
 
-  const fetchSupraveghetori = async () => {
+  const fetchSupraveghetori = useCallback(async () => {
     try {
       const response = await fetch(
         "http://localhost:5000/api/getallsupraveghetori",
@@ -137,9 +128,9 @@ const Doctor = () => {
     } catch (error) {
       console.log(error);
     }
-  };
+  }, [token]);
 
-  const fetchIngrijitori = async () => {
+  const fetchIngrijitori = useCallback(async () => {
     try {
       const response = await fetch(
         "http://localhost:5000/api/getallingrijitori",
@@ -155,13 +146,13 @@ const Doctor = () => {
     } catch (error) {
       console.log(error);
     }
-  };
+  }, [token]);
 
   useEffect(() => {
     fetchPatients();
     fetchSupraveghetori();
     fetchIngrijitori();
-  }, []);
+  }, [fetchPatients, fetchSupraveghetori, fetchIngrijitori]);
 
   const logoutUser = () => {
     localStorage.removeItem("token");
@@ -249,13 +240,19 @@ const Doctor = () => {
           body: JSON.stringify(formDatePacient),
         }
       );
-      const data = await response.json();
-
-      if (data.error) {
-        throw new Error(data.msg);
+      if (response.ok) {
+        // Handle success
+        fetchPatients();
+        const data = await response.json();
+        console.log(data);
+        toast.success(`${data.msg}`, toastOptions);
+      } else {
+        const data = await response.json();
+        // Handle error
+        // data.message in case of JWT expired
+        // Handle error with single message
+        toast.error(`${data.message || data.msg}`, toastOptions);
       }
-
-      console.log("Patient details updated successfully");
     } catch (error) {
       console.error(`Failed to update patient details: ${error}`);
     }
@@ -274,13 +271,18 @@ const Doctor = () => {
           body: JSON.stringify(formDateMedicale),
         }
       );
-      const data = await response.json();
-
-      if (data.error) {
-        throw new Error(data.msg);
+      if (response.ok) {
+        // Handle success
+        fetchPatients();
+        const data = await response.json();
+        toast.success(`${data.msg}`, toastOptions);
+      } else {
+        const data = await response.json();
+        // Handle error
+        // data.message in case of JWT expired
+        // Handle error with single message
+        toast.error(`${data.message || data.msg}`, toastOptions);
       }
-
-      console.log("Medical patient data updated successfully");
     } catch (error) {
       console.error(`Failed to update medical patient data: ${error}`);
     }
@@ -299,13 +301,18 @@ const Doctor = () => {
           body: JSON.stringify(formDateParametrii),
         }
       );
-      const data = await response.json();
-
-      if (data.error) {
-        throw new Error(data.msg);
+      if (response.ok) {
+        // Handle success
+        fetchPatients();
+        const data = await response.json();
+        toast.success(`${data.msg}`, toastOptions);
+      } else {
+        const data = await response.json();
+        // Handle error
+        // data.message in case of JWT expired
+        // Handle error with single message
+        toast.error(`${data.message || data.msg}`, toastOptions);
       }
-
-      console.log("Medical patient data updated successfully");
     } catch (error) {
       console.error(`Failed to update medical patient data: ${error}`);
     }
@@ -423,6 +430,14 @@ const Doctor = () => {
           <Typography variant="h4" gutterBottom>
             Patients
           </Typography>
+          <Button
+            variant="outlined"
+            color="error"
+            onClick={logoutUser}
+            sx={{ position: "absolute", right: 50, top: 35 }}
+          >
+            Logout
+          </Button>
           <Divider />
         </Grid>
         <Grid item xs={12}>
@@ -721,7 +736,7 @@ const Doctor = () => {
 
             <form onSubmit={handleSubmitDateColectate}>
               <Typography variant="h5" gutterBottom>
-                Date colectate
+                Parametrii
               </Typography>
               <Divider sx={{ mt: 1, mb: 2 }} />
               <TextField
@@ -937,14 +952,6 @@ const Doctor = () => {
           />
         </DialogContent>
       </Dialog>
-      <Button
-        variant="outlined"
-        color="error"
-        onClick={logoutUser}
-        sx={{ position: "absolute", right: 4, top: 4 }}
-      >
-        Logout
-      </Button>
     </Box>
   );
 };

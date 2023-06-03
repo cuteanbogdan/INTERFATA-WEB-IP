@@ -30,10 +30,8 @@ const UserForm = ({
   const [loc_munca, setLoc_munca] = useState("");
   const [password, setPassword] = useState("");
   const [varsta, setVarsta] = useState("");
-  const [supraveghetorId, setSupraveghetorId] = useState(
-    "Select Supraveghetor"
-  );
-  const [ingrijitorId, setIngrijitorId] = useState("Select Ingrijitor");
+  const [supraveghetorId, setSupraveghetorId] = useState("");
+  const [ingrijitorId, setIngrijitorId] = useState("");
   const handleUserTypeChange = (event) => {
     setRol(event.target.value);
   };
@@ -107,6 +105,7 @@ const UserForm = ({
         display: "flex",
         justifyContent: "center",
         height: "100vh",
+        width: "50vh",
       }}
     >
       <form onSubmit={handleSubmit}>
@@ -334,38 +333,48 @@ const UserForm = ({
                 type="password"
                 onChange={(e) => setPassword(e.target.value)}
               />
-              <Select
-                value={supraveghetorId}
-                onChange={(e) => setSupraveghetorId(e.target.value)}
-                fullWidth
-                sx={{ width: "200%" }}
-                margin="normal"
-              >
-                {supraveghetori.map((supraveghetor) => (
-                  <MenuItem
-                    key={supraveghetor.id_supraveghetor}
-                    value={supraveghetor.id_supraveghetor}
+              <Box sx={{ mt: 2, width: "100%" }}>
+                <FormControl fullWidth>
+                  <InputLabel id="supraveghetor-label">
+                    Supraveghetor
+                  </InputLabel>
+                  <Select
+                    labelId="supraveghetor-label"
+                    value={supraveghetorId}
+                    onChange={(e) => setSupraveghetorId(e.target.value)}
+                    sx={{ width: "200%" }}
                   >
-                    {supraveghetor.nume}
-                  </MenuItem>
-                ))}
-              </Select>
-              <Select
-                value={ingrijitorId}
-                onChange={(e) => setIngrijitorId(e.target.value)}
-                fullWidth
-                sx={{ width: "200%" }}
-                margin="normal"
-              >
-                {ingrijitori.map((ingrijitor) => (
-                  <MenuItem
-                    key={ingrijitor.id_ingrijitor}
-                    value={ingrijitor.id_ingrijitor}
+                    {supraveghetori.map((supraveghetor) => (
+                      <MenuItem
+                        key={supraveghetor.id_supraveghetor}
+                        value={supraveghetor.id_supraveghetor}
+                      >
+                        {supraveghetor.nume}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Box>
+              <Box sx={{ mt: 2, width: "100%" }}>
+                <FormControl fullWidth>
+                  <InputLabel id="ingrijitor-label">Ingrijitor</InputLabel>
+                  <Select
+                    labelId="ingrijitor-label"
+                    value={ingrijitorId}
+                    onChange={(e) => setIngrijitorId(e.target.value)}
+                    sx={{ width: "200%" }}
                   >
-                    {ingrijitor.nume}
-                  </MenuItem>
-                ))}
-              </Select>
+                    {ingrijitori.map((ingrijitor) => (
+                      <MenuItem
+                        key={ingrijitor.id_ingrijitor}
+                        value={ingrijitor.id_ingrijitor}
+                      >
+                        {ingrijitor.nume}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Box>
             </>
           )}
           {rol === "Ingrijitor" && (

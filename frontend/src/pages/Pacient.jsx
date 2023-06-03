@@ -1,21 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import {
   Container,
   Typography,
-  Box,
   Grid,
   Avatar,
   Card,
   CardContent,
-  Chip,
+  Button,
 } from "@mui/material";
 import useAuthRoles from "../utils/useAuthRoles";
 import { useNavigate } from "react-router-dom";
 import { styled } from "@mui/system";
 import CardHeader from "@mui/material/CardHeader";
-import IconButton from "@mui/material/IconButton";
-import EditIcon from "@mui/icons-material/Edit";
 const StyledAvatar = styled(Avatar)(({ theme }) => ({
   backgroundColor: theme.palette.primary.main,
   marginRight: theme.spacing(2),
@@ -31,14 +28,14 @@ const StyledCard = styled(Card)(({ theme }) => ({
 const Patient = () => {
   const [pacientData, setPacientData] = useState(null);
   const token = localStorage.getItem("token");
-  const { authenticated, loading, userRole } = useAuthRoles([
+  const { authenticated, loading } = useAuthRoles([
     "Administrator",
     "Doctor",
     "Pacient",
   ]);
   const history = useNavigate();
   const { id } = useParams();
-  const fetchPatient = async () => {
+  const fetchPatient = useCallback(async () => {
     try {
       const responsePacient = await fetch(
         `http://localhost:5000/api/get-pacient-details/${id}`,
@@ -81,10 +78,15 @@ const Patient = () => {
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  };
+  }, [id, token]);
   useEffect(() => {
     fetchPatient();
-  }, [id]);
+  }, [id, fetchPatient]);
+
+  const logoutUser = () => {
+    localStorage.removeItem("token");
+    history("/login");
+  };
 
   if (loading) {
     return <div>Loading...</div>;
@@ -99,15 +101,15 @@ const Patient = () => {
 
   return (
     <Container maxWidth="md">
-      <Grid container spacing={3}>
+      <Grid container spacing={3} style={{ marginTop: "10px" }}>
         <Grid item xs={12}>
           <StyledCard>
             <CardHeader
               avatar={<StyledAvatar>{pacientData.nume.charAt(0)}</StyledAvatar>}
               action={
-                <IconButton>
-                  <EditIcon />
-                </IconButton>
+                <Button variant="outlined" color="error" onClick={logoutUser}>
+                  Logout
+                </Button>
               }
               title={`${pacientData.nume} ${pacientData.prenume}`}
               subheader={pacientData.rol}

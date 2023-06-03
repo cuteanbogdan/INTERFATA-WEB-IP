@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import UserForm from "./UserForm";
-import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import { styled } from "@mui/material/styles";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import useAuth from "../utils/useAuth";
 import {
   Table,
@@ -14,8 +14,6 @@ import {
   TableHead,
   TableRow,
   Paper,
-  Select,
-  MenuItem,
   Button,
   Dialog,
   DialogTitle,
@@ -53,8 +51,9 @@ const Administrator = () => {
   const [open, setOpen] = useState(false);
   const history = useNavigate();
   const token = localStorage.getItem("token");
-  const { authenticated, loading, userRole } = useAuth();
-  const fetchUsers = async () => {
+  const { authenticated, loading } = useAuth();
+
+  const fetchUsers = useCallback(async () => {
     try {
       const response = await fetch("http://localhost:5000/api/getallusers", {
         method: "POST",
@@ -67,8 +66,9 @@ const Administrator = () => {
     } catch (error) {
       console.log(error);
     }
-  };
-  const fetchSupraveghetori = async () => {
+  }, [token]);
+
+  const fetchSupraveghetori = useCallback(async () => {
     try {
       const response = await fetch(
         "http://localhost:5000/api/getallsupraveghetori",
@@ -84,9 +84,9 @@ const Administrator = () => {
     } catch (error) {
       console.log(error);
     }
-  };
+  }, [token]);
 
-  const fetchIngrijitori = async () => {
+  const fetchIngrijitori = useCallback(async () => {
     try {
       const response = await fetch(
         "http://localhost:5000/api/getallingrijitori",
@@ -102,12 +102,14 @@ const Administrator = () => {
     } catch (error) {
       console.log(error);
     }
-  };
+  }, [token]);
+
   useEffect(() => {
     fetchUsers();
     fetchSupraveghetori();
     fetchIngrijitori();
-  }, [users]);
+  }, [fetchUsers, fetchSupraveghetori, fetchIngrijitori]);
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -192,6 +194,45 @@ const Administrator = () => {
             User Management
           </Typography>
         </Grid>
+        <Grid
+          item
+          xs={2}
+          sx={{
+            display: "flex",
+            justifyContent: "flex-end",
+            alignItems: "center",
+            marginBottom: "2rem",
+          }}
+        >
+          <Button
+            component={Link}
+            to="/doctor"
+            variant="contained"
+            color="primary"
+            sx={{ marginRight: "1rem", minWidth: "150px", padding: "0 15px" }}
+          >
+            Doctor
+          </Button>
+          <Button
+            component={Link}
+            to="/ingrijitor"
+            variant="contained"
+            color="primary"
+            sx={{ marginRight: "1rem", minWidth: "150px", padding: "0 15px" }}
+          >
+            Ingrijitor
+          </Button>
+          <Button
+            component={Link}
+            to="/supraveghetor"
+            variant="contained"
+            color="primary"
+            sx={{ minWidth: "150px", padding: "0 15px" }}
+          >
+            Supraveghetor
+          </Button>
+        </Grid>
+
         <Grid item xs={12}>
           <TableContainer component={Paper} elevation={2}>
             <Table>
