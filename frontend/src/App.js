@@ -9,6 +9,7 @@ import Pacient from "./pages/Pacient";
 import Test from "./pages/Test";
 import { ThemeProvider } from '@mui/material/styles';
 import theme from './theme';
+import Ingrijitor from "./pages/Ingrijitor";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
           <Route exact path="/change-password" element={<ChangePassword />} />
           <Route exact path="/update-password" element={<UpdatePassword />} />
           <Route exact path="/test" element={<Test />} />
+          <Route exact path="/ingrijitor" element={<Ingrijitor />} />
         </Routes>
       </Router>
     </ThemeProvider>
