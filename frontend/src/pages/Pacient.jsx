@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
 import {
   Container,
   Typography,
@@ -8,6 +9,8 @@ import {
   Card,
   CardContent,
   Button,
+  TextField,
+  Box,
 } from "@mui/material";
 import useAuthRoles from "../utils/useAuthRoles";
 import { useNavigate } from "react-router-dom";
@@ -17,6 +20,17 @@ const StyledAvatar = styled(Avatar)(({ theme }) => ({
   backgroundColor: theme.palette.primary.main,
   marginRight: theme.spacing(2),
 }));
+
+const toastOptions = {
+  position: "bottom-right",
+  autoClose: 5000,
+  hideProgressBar: false,
+  closeOnClick: true,
+  pauseOnHover: true,
+  draggable: true,
+  progress: undefined,
+  theme: "light",
+};
 
 const StyledCard = styled(Card)(({ theme }) => ({
   marginBottom: theme.spacing(2),
@@ -67,13 +81,35 @@ const Patient = () => {
           },
         }
       );
+      const responseAlarme = await fetch(
+        `http://localhost:5000/api/get-alarm-details/${dataPacient.data.id_alarma}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
+      const responseRecomandare = await fetch(
+        `http://localhost:5000/api/get-recomandari-details/${dataPacient.data.id_recomandare}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const dataRecomandare = await responseRecomandare.json();
+      const dataAlarme = await responseAlarme.json();
       const dataMedicale = await responseMedicale.json();
       const dataColectate = await responseColectate.json();
       setPacientData({
         ...dataPacient.data,
         ...dataMedicale.data,
         ...dataColectate.data,
+        ...dataAlarme.data,
+        ...dataRecomandare.data,
       });
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -82,6 +118,64 @@ const Patient = () => {
   useEffect(() => {
     fetchPatient();
   }, [id, fetchPatient]);
+  const [formValoriFiziologice, setFormValoriFiziologice] = useState({
+    temp_corp: null,
+    greutate: null,
+    glicemie: null,
+  });
+
+  useEffect(() => {
+    if (pacientData) {
+      setFormValoriFiziologice({
+        temp_corp: pacientData?.temp_corp,
+        greutate: pacientData?.greutate,
+        glicemie: pacientData?.glicemie,
+      });
+    }
+  }, [pacientData]);
+
+  const handleChangeValoriFiziologice = (event) => {
+    const { name, value } = event.target;
+    setFormValoriFiziologice({
+      ...formValoriFiziologice,
+      [name]: value,
+    });
+  };
+
+  const handleSubmitValoriFiziologice = async (e) => {
+    e.preventDefault();
+    console.log(formValoriFiziologice);
+
+    try {
+      const id_colectie = pacientData.id_colectie;
+      const response = await fetch(
+        `http://localhost:5000/api/update-date-colectate/${id_colectie}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formValoriFiziologice),
+        }
+      );
+
+      if (response.ok) {
+        // Handle success
+        const data = await response.json();
+        toast.success(`${data.msg}`, toastOptions);
+      } else {
+        const data = await response.json();
+        // Handle error
+        // data.message in case of JWT expired
+        // Handle error with single message
+        toast.error(`${data.message || data.msg}`, toastOptions);
+      }
+    } catch (error) {
+      // Handle Error
+      console.log("Error:", error);
+    }
+  };
 
   const logoutUser = () => {
     localStorage.removeItem("token");
@@ -101,6 +195,18 @@ const Patient = () => {
 
   return (
     <Container maxWidth="md">
+      <ToastContainer
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
       <Grid container spacing={3} style={{ marginTop: "10px" }}>
         <Grid item xs={12}>
           <StyledCard>
@@ -248,17 +354,122 @@ const Patient = () => {
             </CardContent>
           </StyledCard>
         </Grid>
-
+        {console.log(pacientData)}
         <Grid item xs={12}>
           <StyledCard>
             <CardHeader
-              title="Additional Information"
+              title="Alarma"
               titleTypographyProps={{ variant: "h6" }}
             />
             <CardContent>
               <Typography>
-                <strong>Other details:</strong> {pacientData.additional_details}
+                <strong>ID alarma:</strong> {pacientData.id_alarma}
               </Typography>
+              <Typography>
+                <strong>Data si ora:</strong> {pacientData.data_ora}
+              </Typography>
+              <Typography>
+                <strong>Tipul parametrului: </strong>{" "}
+                {pacientData.tip_parametru}
+              </Typography>
+              <Typography>
+                <strong>Valoarea masurata:</strong>{" "}
+                {pacientData.valoare_masurata}
+              </Typography>
+              <Typography>
+                <strong>Mesaj: </strong> {pacientData.mesaj}
+              </Typography>
+            </CardContent>
+          </StyledCard>
+        </Grid>
+        <Grid item xs={12}>
+          <StyledCard>
+            <CardHeader
+              title="Recomandari"
+              titleTypographyProps={{ variant: "h6" }}
+            />
+            <CardContent>
+              <Typography>
+                <strong>ID recomandare:</strong> {pacientData.id_recomandare}
+              </Typography>
+              <Typography>
+                <strong>Recomandare: </strong> {pacientData.recomandare}
+              </Typography>
+              <Typography>
+                <strong>Timp: </strong> {pacientData.timp}
+              </Typography>
+              <Typography>
+                <strong>Detalii: </strong> {pacientData.detalii}
+              </Typography>
+            </CardContent>
+          </StyledCard>
+        </Grid>
+        <Grid item xs={12}>
+          <StyledCard>
+            <CardHeader
+              title="Setare date medicale"
+              titleTypographyProps={{ variant: "h6" }}
+            />
+            <CardContent>
+              <form
+                noValidate
+                autoComplete="off"
+                onSubmit={handleSubmitValoriFiziologice}
+              >
+                <TextField
+                  name="temp_corp"
+                  id="temp_corp"
+                  label="Temperatura corporala"
+                  style={{ margin: 8 }}
+                  fullWidth
+                  margin="normal"
+                  required
+                  value={formValoriFiziologice.temp_corp}
+                  onChange={handleChangeValoriFiziologice}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
+                <TextField
+                  name="greutate"
+                  id="greutate"
+                  label="Greutate"
+                  style={{ margin: 8 }}
+                  fullWidth
+                  margin="normal"
+                  required
+                  value={formValoriFiziologice.greutate}
+                  onChange={handleChangeValoriFiziologice}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
+                <TextField
+                  name="glicemie"
+                  id="glicemie"
+                  label="Glicemie"
+                  style={{ margin: 8 }}
+                  fullWidth
+                  margin="normal"
+                  required
+                  value={formValoriFiziologice.glicemie}
+                  onChange={handleChangeValoriFiziologice}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
+                <Box display="flex" justifyContent="center" mt={2}>
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    color="primary"
+                    fullWidth
+                    sx={{ marginLeft: "1rem" }}
+                  >
+                    Trimite
+                  </Button>
+                </Box>
+              </form>
             </CardContent>
           </StyledCard>
         </Grid>
