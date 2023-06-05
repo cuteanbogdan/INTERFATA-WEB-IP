@@ -11,6 +11,8 @@ import {
   TextField,
   Box,
 } from "@mui/material";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import { Pie } from "react-chartjs-2";
 import useAuthRoles from "../utils/useAuthRoles";
 import { useNavigate } from "react-router-dom";
 import { styled } from "@mui/system";
@@ -30,6 +32,8 @@ const toastOptions = {
   progress: undefined,
   theme: "light",
 };
+
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 const StyledCard = styled(Card)(({ theme }) => ({
   marginBottom: theme.spacing(2),
@@ -169,7 +173,6 @@ const Ingrijitor = () => {
 
   const handleSubmitValoriFiziologice = async (e) => {
     e.preventDefault();
-    console.log(formValoriFiziologice);
 
     try {
       const id_colectie = pacientData.id_colectie;
@@ -189,6 +192,7 @@ const Ingrijitor = () => {
         // Handle success
         const data = await response.json();
         toast.success(`${data.msg}`, toastOptions);
+        window.location.reload(false);
       } else {
         const data = await response.json();
         // Handle error
@@ -217,6 +221,32 @@ const Ingrijitor = () => {
   if (!pacientData) {
     return <Typography>Loading...</Typography>;
   }
+
+  const data = {
+    labels: ["Temperatura corporala", "Greutate", "Glicemie"],
+    datasets: [
+      {
+        label: "Valoare: ",
+        data: [
+          pacientData.temp_corp,
+          pacientData.greutate,
+          pacientData.glicemie,
+        ],
+        backgroundColor: [
+          "rgba(255, 99, 132, 0.2)",
+          "rgba(54, 162, 235, 0.2)",
+          "rgba(255, 206, 86, 0.2)",
+        ],
+        borderColor: [
+          "rgba(255, 99, 132, 1)",
+          "rgba(54, 162, 235, 1)",
+          "rgba(255, 206, 86, 1)",
+        ],
+        borderWidth: 1,
+      },
+    ],
+  };
+
   return (
     <Container maxWidth="md">
       <ToastContainer
@@ -498,6 +528,9 @@ const Ingrijitor = () => {
           </StyledCard>
         </Grid>
       </Grid>
+      <div style={{ maxWidth: "400px", maxHeight: "400px" }}>
+        <Pie data={data} />
+      </div>
     </Container>
   );
 };
