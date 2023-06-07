@@ -49,7 +49,7 @@ const Ingrijitor = () => {
     "Administrator",
     "Ingrijitor",
   ]);
-
+  // eslint-disable-next-line
   const [ingrijitorData, setIngrijitorData] = useState("");
   const id = useRef("");
   const history = useNavigate();

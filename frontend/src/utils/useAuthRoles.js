@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 
 const useAuthRoles = (allowedRoles) => {
     const [authenticated, setAuthenticated] = useState(false);
@@ -40,7 +39,7 @@ const useAuthRoles = (allowedRoles) => {
         };
 
         verifyToken();
-    }, []);
+    }, [allowedRoles]);
 
     return { authenticated, loading, userRole };
 };

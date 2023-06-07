@@ -54,7 +54,7 @@ const useAuth = () => {
         };
 
         verifyToken();
-    }, []);
+    }, [history]);
 
     return { authenticated, loading, userRole };
 };
