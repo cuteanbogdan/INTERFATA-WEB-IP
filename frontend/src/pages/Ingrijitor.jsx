@@ -146,6 +146,7 @@ const Ingrijitor = () => {
   }, [userRole, fetchIngrijitor]);
 
   const [formValoriFiziologice, setFormValoriFiziologice] = useState({
+    TA: null,
     temp_corp: null,
     greutate: null,
     glicemie: null,
@@ -154,6 +155,7 @@ const Ingrijitor = () => {
   useEffect(() => {
     if (pacientData) {
       setFormValoriFiziologice({
+        TA: pacientData?.TA,
         temp_corp: pacientData?.temp_corp,
         greutate: pacientData?.greutate,
         glicemie: pacientData?.glicemie,
@@ -223,21 +225,29 @@ const Ingrijitor = () => {
   }
 
   const data = {
-    labels: ["Temperatura corporala", "Greutate", "Glicemie"],
+    labels: [
+      "Tensiune arteriala",
+      "Temperatura corporala",
+      "Greutate",
+      "Glicemie",
+    ],
     datasets: [
       {
         label: "Valoare: ",
         data: [
+          pacientData.TA,
           pacientData.temp_corp,
           pacientData.greutate,
           pacientData.glicemie,
         ],
         backgroundColor: [
+          "rgba(146, 95, 241, 0.2)",
           "rgba(255, 99, 132, 0.2)",
           "rgba(54, 162, 235, 0.2)",
           "rgba(255, 206, 86, 0.2)",
         ],
         borderColor: [
+          "rgba(146, 95, 241, 1)",
           "rgba(255, 99, 132, 1)",
           "rgba(54, 162, 235, 1)",
           "rgba(255, 206, 86, 1)",
@@ -470,6 +480,20 @@ const Ingrijitor = () => {
                 autoComplete="off"
                 onSubmit={handleSubmitValoriFiziologice}
               >
+                <TextField
+                  name="TA"
+                  id="TA"
+                  label="Tensiune arteriala"
+                  style={{ margin: 8 }}
+                  fullWidth
+                  margin="normal"
+                  required
+                  value={formValoriFiziologice.TA}
+                  onChange={handleChangeValoriFiziologice}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
                 <TextField
                   name="temp_corp"
                   id="temp_corp"

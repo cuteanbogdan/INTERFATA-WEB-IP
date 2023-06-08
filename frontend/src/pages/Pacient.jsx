@@ -46,11 +46,12 @@ const StyledCard = styled(Card)(({ theme }) => ({
 const Patient = () => {
   const [pacientData, setPacientData] = useState(null);
   const token = localStorage.getItem("token");
-  const { authenticated, loading } = useAuthRoles([
+  const { authenticated, loading, userRole } = useAuthRoles([
     "Administrator",
     "Doctor",
     "Pacient",
   ]);
+  console.log(userRole);
   const history = useNavigate();
   const { id } = useParams();
   const fetchPatient = useCallback(async () => {
@@ -122,15 +123,33 @@ const Patient = () => {
   useEffect(() => {
     fetchPatient();
   }, [id, fetchPatient]);
+  function getCurrentDateTime() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    const hours = String(now.getHours()).padStart(2, "0");
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+    const seconds = String(now.getSeconds()).padStart(2, "0");
+
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  }
   const [formValoriFiziologice, setFormValoriFiziologice] = useState({
+    TA: null,
     temp_corp: null,
     greutate: null,
     glicemie: null,
   });
-
+  const [dateRecomandare, setDateRecomandare] = useState({
+    recomandareDoctor: null,
+    timpDoctor: getCurrentDateTime(),
+    detaliiDoctor: null,
+  });
+  console.log(dateRecomandare);
   useEffect(() => {
     if (pacientData) {
       setFormValoriFiziologice({
+        TA: pacientData?.TA,
         temp_corp: pacientData?.temp_corp,
         greutate: pacientData?.greutate,
         glicemie: pacientData?.glicemie,
@@ -142,6 +161,14 @@ const Patient = () => {
     const { name, value } = event.target;
     setFormValoriFiziologice({
       ...formValoriFiziologice,
+      [name]: value,
+    });
+  };
+
+  const handleChangeValoriRecomandare = (event) => {
+    const { name, value } = event.target;
+    setDateRecomandare({
+      ...dateRecomandare,
       [name]: value,
     });
   };
@@ -181,6 +208,40 @@ const Patient = () => {
     }
   };
 
+  const handleSubmitRecomandareDoctor = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/recomandare-doctor/${id}`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(dateRecomandare),
+        }
+      );
+
+      if (response.ok) {
+        // Handle success
+        const data = await response.json();
+        toast.success(`${data.msg}`, toastOptions);
+        fetchPatient();
+      } else {
+        const data = await response.json();
+        // Handle error
+        // data.message in case of JWT expired
+        // Handle error with single message
+        toast.error(`${data.message || data.msg}`, toastOptions);
+      }
+    } catch (error) {
+      // Handle Error
+      console.log("Error:", error);
+    }
+  };
+
   const logoutUser = () => {
     localStorage.removeItem("token");
     history("/login");
@@ -197,21 +258,29 @@ const Patient = () => {
     return <Typography>Loading...</Typography>;
   }
   const data = {
-    labels: ["Temperatura corporala", "Greutate", "Glicemie"],
+    labels: [
+      "Tensiune arteriala",
+      "Temperatura corporala",
+      "Greutate",
+      "Glicemie",
+    ],
     datasets: [
       {
         label: "Valoare: ",
         data: [
+          pacientData.TA,
           pacientData.temp_corp,
           pacientData.greutate,
           pacientData.glicemie,
         ],
         backgroundColor: [
+          "rgba(146, 95, 241, 0.2)",
           "rgba(255, 99, 132, 0.2)",
           "rgba(54, 162, 235, 0.2)",
           "rgba(255, 206, 86, 0.2)",
         ],
         borderColor: [
+          "rgba(146, 95, 241, 1)",
           "rgba(255, 99, 132, 1)",
           "rgba(54, 162, 235, 1)",
           "rgba(255, 206, 86, 1)",
@@ -444,6 +513,20 @@ const Patient = () => {
                 onSubmit={handleSubmitValoriFiziologice}
               >
                 <TextField
+                  name="TA"
+                  id="TA"
+                  label="Tensiune arteriala"
+                  style={{ margin: 8 }}
+                  fullWidth
+                  margin="normal"
+                  required
+                  value={formValoriFiziologice.TA}
+                  onChange={handleChangeValoriFiziologice}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                />
+                <TextField
                   name="temp_corp"
                   id="temp_corp"
                   label="Temperatura corporala"
@@ -504,6 +587,65 @@ const Patient = () => {
       <div style={{ maxWidth: "400px", maxHeight: "400px" }}>
         <Pie data={data} />
       </div>
+      <>
+        {userRole === "Doctor" && (
+          <Grid item xs={12}>
+            <StyledCard>
+              <CardHeader
+                title="Recomandare de la doctor"
+                titleTypographyProps={{ variant: "h6" }}
+              />
+              <CardContent>
+                <form
+                  noValidate
+                  autoComplete="off"
+                  onSubmit={handleSubmitRecomandareDoctor}
+                >
+                  <TextField
+                    name="recomandareDoctor"
+                    id="recomandareDoctor"
+                    label="Recomandare"
+                    style={{ margin: 8 }}
+                    fullWidth
+                    margin="normal"
+                    required
+                    value={dateRecomandare.recomandareDoctor}
+                    onChange={handleChangeValoriRecomandare}
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                  />
+                  <TextField
+                    name="detaliiDoctor"
+                    id="detaliiDoctor"
+                    label="Detalii recomandare"
+                    style={{ margin: 8 }}
+                    fullWidth
+                    margin="normal"
+                    required
+                    value={dateRecomandare.detaliiDoctor}
+                    onChange={handleChangeValoriRecomandare}
+                    InputLabelProps={{
+                      shrink: true,
+                    }}
+                  />
+                  <Box display="flex" justifyContent="center" mt={2}>
+                    <Button
+                      type="submit"
+                      variant="contained"
+                      color="primary"
+                      fullWidth
+                      sx={{ marginLeft: "1rem" }}
+                    >
+                      Trimite
+                    </Button>
+                  </Box>
+                </form>
+              </CardContent>
+            </StyledCard>
+          </Grid>
+        )}
+      </>
     </Container>
   );
 };
