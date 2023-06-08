@@ -17,6 +17,7 @@ import useAuthRoles from "../utils/useAuthRoles";
 import { useNavigate } from "react-router-dom";
 import { styled } from "@mui/system";
 import CardHeader from "@mui/material/CardHeader";
+
 const StyledAvatar = styled(Avatar)(({ theme }) => ({
   backgroundColor: theme.palette.primary.main,
   marginRight: theme.spacing(2),
