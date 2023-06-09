@@ -12,7 +12,19 @@ import {
   TextField,
   Box,
 } from "@mui/material";
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import { Line } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend,
+  LineController,
+  CategoryScale,
+  LineElement,
+  PointElement,
+  LinearScale,
+  Title,
+} from "chart.js";
 import { Pie } from "react-chartjs-2";
 import useAuthRoles from "../utils/useAuthRoles";
 import { useNavigate } from "react-router-dom";
@@ -34,7 +46,17 @@ const toastOptions = {
   theme: "light",
 };
 
-ChartJS.register(ArcElement, Tooltip, Legend);
+ChartJS.register(
+  ArcElement,
+  Tooltip,
+  Legend,
+  CategoryScale,
+  LineController,
+  LineElement,
+  PointElement,
+  LinearScale,
+  Title
+);
 
 const StyledCard = styled(Card)(({ theme }) => ({
   marginBottom: theme.spacing(2),
@@ -51,7 +73,8 @@ const Patient = () => {
     "Doctor",
     "Pacient",
   ]);
-  console.log(userRole);
+  const [chartData, setChartData] = useState({});
+
   const history = useNavigate();
   const { id } = useParams();
   const fetchPatient = useCallback(async () => {
@@ -145,7 +168,7 @@ const Patient = () => {
     timpDoctor: getCurrentDateTime(),
     detaliiDoctor: null,
   });
-  console.log(dateRecomandare);
+
   useEffect(() => {
     if (pacientData) {
       setFormValoriFiziologice({
@@ -241,6 +264,63 @@ const Patient = () => {
       console.log("Error:", error);
     }
   };
+  useEffect(() => {
+    const fetchDateIstorice = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:5000/api/get-date-istorice`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+
+          // Now that you have the data, you can set the chart.
+          setChartData({
+            labels: data.data.map((item) => item.id_date),
+            datasets: [
+              {
+                label: "Tensiune arteriala",
+                data: data.data.map((item) => item.tensiune),
+                backgroundColor: "rgba(75,192,192,0.6)",
+                borderWidth: 4,
+              },
+              {
+                label: "Temperatura corporala",
+                data: data.data.map((item) => item.temperatura_corp),
+                backgroundColor: "rgba(192,192,75,0.6)",
+                borderWidth: 4,
+              },
+              {
+                label: "Greutate",
+                data: data.data.map((item) => item.greutate),
+                backgroundColor: "rgba(192,75,192,0.6)",
+                borderWidth: 4,
+              },
+              {
+                label: "Glicemie",
+                data: data.data.map((item) => item.glicemie),
+                backgroundColor: "rgba(75,75,192,0.6)",
+                borderWidth: 4,
+              },
+            ],
+          });
+        } else {
+          const data = await response.json();
+          console.log("Error:", data.message || data.msg);
+        }
+      } catch (error) {
+        console.log("Error:", error);
+      }
+    };
+
+    fetchDateIstorice();
+  }, [token]);
 
   const logoutUser = () => {
     localStorage.removeItem("token");
@@ -310,7 +390,7 @@ const Patient = () => {
               avatar={<StyledAvatar>{pacientData.nume.charAt(0)}</StyledAvatar>}
               action={
                 <Button variant="outlined" color="error" onClick={logoutUser}>
-                  Logout
+                  Deconectare
                 </Button>
               }
               title={`${pacientData.nume} ${pacientData.prenume}`}
@@ -322,12 +402,15 @@ const Patient = () => {
         <Grid item xs={12} sm={6}>
           <StyledCard>
             <CardHeader
-              title="Personal Details"
+              title="Detalii personale"
               titleTypographyProps={{ variant: "h6" }}
             />
             <CardContent>
               <Typography>
                 <strong>CNP:</strong> {pacientData.cnp}
+              </Typography>
+              <Typography>
+                <strong>Varsta:</strong> {pacientData.varsta}
               </Typography>
               <Typography>
                 <strong>Adresa:</strong> {pacientData.adresa}
@@ -346,7 +429,7 @@ const Patient = () => {
         <Grid item xs={12} sm={6}>
           <StyledCard>
             <CardHeader
-              title="Work & Education"
+              title="Detalii profesie"
               titleTypographyProps={{ variant: "h6" }}
             />
             <CardContent>
@@ -359,9 +442,6 @@ const Patient = () => {
               <Typography>
                 <strong>Loc Munca:</strong> {pacientData.loc_munca}
               </Typography>
-              <Typography>
-                <strong>Varsta:</strong> {pacientData.varsta}
-              </Typography>
             </CardContent>
           </StyledCard>
         </Grid>
@@ -369,7 +449,7 @@ const Patient = () => {
         <Grid item xs={12} sm={6}>
           <StyledCard>
             <CardHeader
-              title="Medical Details"
+              title="Detalii medicale"
               titleTypographyProps={{ variant: "h6" }}
             />
             <CardContent>
@@ -413,7 +493,7 @@ const Patient = () => {
         <Grid item xs={12} sm={6}>
           <StyledCard>
             <CardHeader
-              title="Collected Details"
+              title="Detalii colectate"
               titleTypographyProps={{ variant: "h6" }}
             />
             <CardContent>
@@ -584,9 +664,43 @@ const Patient = () => {
           </StyledCard>
         </Grid>
       </Grid>
-      <div style={{ maxWidth: "400px", maxHeight: "400px" }}>
+      <Typography
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "60px",
+        }}
+      >
+        <strong>Grafic date medicale</strong>
+      </Typography>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "400px",
+        }}
+      >
         <Pie data={data} />
       </div>
+      <Typography
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "60px",
+        }}
+      >
+        <strong>Grafic istoric date medicale</strong>
+      </Typography>
+      <Line
+        data={chartData}
+        options={{
+          responsive: true,
+          title: { text: "Valori Fiziologice", display: true },
+        }}
+      />
       <>
         {userRole === "Doctor" && (
           <Grid item xs={12}>

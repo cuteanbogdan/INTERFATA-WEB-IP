@@ -6,7 +6,6 @@ import {
   TextField,
   Typography,
   Button,
-  Link,
   Container,
   Grid,
   CssBaseline,
@@ -41,7 +40,6 @@ const Login = () => {
         password,
       })
       .then(async (response) => {
-        await console.log(response.data);
         localStorage.setItem("token", response.data.token);
         history("/administrator");
       })
@@ -124,18 +122,8 @@ const Login = () => {
                 sx={{ mt: 2, mb: 2 }}
                 onClick={loginUser}
               >
-                Login
+                Autentificare
               </Button>
-              <Grid container>
-                <Grid item xs>
-                  <Typography variant="body2" align="center" sx={{ pb: 2 }}>
-                    Don't have an account?{" "}
-                    <Link href="#">
-                      Contact the administrator to create one.
-                    </Link>
-                  </Typography>
-                </Grid>
-              </Grid>
             </CardContent>
           </Card>
           <Grid
@@ -155,7 +143,7 @@ const Login = () => {
                 fullWidth
                 onClick={() => history("/change-password")}
               >
-                Change Password
+                Schimba parola
               </Button>
             </Grid>
           </Grid>

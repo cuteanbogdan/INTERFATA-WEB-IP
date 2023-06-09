@@ -54,11 +54,11 @@ const dateParametrii = {
   TA_min: "",
   TA_max: "",
   puls_min: "",
-  puls_maax: "",
+  puls_max: "",
   temp_corp_min: "",
   temp_corp_max: "",
   greutate_min: "",
-  greuatate_max: "",
+  greutate_max: "",
   glicemie_min: "",
   glicemie_max: "",
   temp_amb_min: "",
@@ -428,7 +428,7 @@ const Doctor = () => {
       <Grid container spacing={4}>
         <Grid item xs={12}>
           <Typography variant="h4" gutterBottom>
-            Patients
+            Pacienti
           </Typography>
           <Button
             variant="outlined"
@@ -449,7 +449,7 @@ const Doctor = () => {
                   <TableCell>Nume</TableCell>
                   <TableCell>Prenume</TableCell>
                   <TableCell>Varsta</TableCell>
-                  <TableCell>Actions</TableCell>
+                  <TableCell>Actiune</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -464,22 +464,24 @@ const Doctor = () => {
                         variant="contained"
                         color="primary"
                         onClick={() => handleView(patient)}
+                        style={{ marginRight: "15px" }}
                       >
-                        View
+                        Fisa Medicala
                       </Button>
                       <Button
                         variant="contained"
                         color="primary"
                         onClick={() => handleEdit(patient)}
+                        style={{ marginRight: "15px" }}
                       >
-                        Edit
+                        Modifica
                       </Button>
                       <Button
                         variant="contained"
                         color="secondary"
                         onClick={() => handleDeletePacient(patient.id_pacient)}
                       >
-                        Delete
+                        Sterge
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -494,7 +496,7 @@ const Doctor = () => {
             color="primary"
             onClick={() => setOpenCreate(true)}
           >
-            Create New Patient
+            Creeaza pacient
           </Button>
         </Grid>
       </Grid>{" "}
@@ -518,7 +520,7 @@ const Doctor = () => {
             }}
           >
             <Typography variant="h4" gutterBottom>
-              Edit Patient
+              Modifica date
             </Typography>
             <Divider sx={{ mt: 1, mb: 2 }} />
             <form onSubmit={handleSubmitPatientsDetails}>
@@ -619,8 +621,23 @@ const Doctor = () => {
                 value={formDatePacient.loc_munca}
                 onChange={handleFormDatePacient}
               />
-              <Button variant="contained" color="primary" type="submit">
-                Save
+              <Button
+                variant="contained"
+                color="primary"
+                type="submit"
+                style={{ marginRight: "15px" }}
+              >
+                Salveaza
+              </Button>
+              <Button
+                variant="contained"
+                onClick={() => {
+                  setOpen(false);
+                  setSelectedPatient(null);
+                  setFormDateMedicale(formDateMedicale);
+                }}
+              >
+                Anuleaza
               </Button>
             </form>
 
@@ -719,8 +736,13 @@ const Doctor = () => {
                 onChange={handleFormChange}
                 sx={{ mb: 2 }}
               />
-              <Button variant="contained" color="primary" type="submit">
-                Save
+              <Button
+                variant="contained"
+                color="primary"
+                type="submit"
+                style={{ marginRight: "15px" }}
+              >
+                Salveaza
               </Button>
               <Button
                 variant="contained"
@@ -730,7 +752,7 @@ const Doctor = () => {
                   setFormDateMedicale(formDateMedicale);
                 }}
               >
-                Cancel
+                Anuleaza
               </Button>
             </form>
 
@@ -770,12 +792,12 @@ const Doctor = () => {
                 sx={{ mb: 2 }}
               />
               <TextField
-                name="puls_maax"
+                name="puls_max"
                 label="
                 Puls maxim"
                 variant="outlined"
                 fullWidth
-                value={formDateParametrii.puls_maax}
+                value={formDateParametrii.puls_max}
                 onChange={handleDateColectateFormChange}
                 sx={{ mb: 2 }}
               />
@@ -810,12 +832,12 @@ const Doctor = () => {
                 sx={{ mb: 2 }}
               />
               <TextField
-                name="greuatate_max"
+                name="greutate_max"
                 label="
                 Greutate maxima"
                 variant="outlined"
                 fullWidth
-                value={formDateParametrii.greuatate_max}
+                value={formDateParametrii.greutate_max}
                 onChange={handleDateColectateFormChange}
                 sx={{ mb: 2 }}
               />
@@ -919,8 +941,13 @@ const Doctor = () => {
                 onChange={handleDateColectateFormChange}
                 sx={{ mb: 2 }}
               />
-              <Button variant="contained" color="primary" type="submit">
-                Save
+              <Button
+                variant="contained"
+                color="primary"
+                type="submit"
+                style={{ marginRight: "15px" }}
+              >
+                Salveaza
               </Button>
               <Button
                 variant="contained"
@@ -930,7 +957,7 @@ const Doctor = () => {
                   setFormDateMedicale(formDateMedicale);
                 }}
               >
-                Cancel
+                Anuleaza
               </Button>
             </form>
           </Box>

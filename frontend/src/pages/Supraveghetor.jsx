@@ -8,10 +8,22 @@ import {
   Card,
   CardContent,
   Button,
-  TextField,
   Box,
+  Alert,
 } from "@mui/material";
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend,
+  LineController,
+  CategoryScale,
+  LineElement,
+  PointElement,
+  LinearScale,
+  Title,
+} from "chart.js";
+import { Line } from "react-chartjs-2";
 import { Pie } from "react-chartjs-2";
 import useAuthRoles from "../utils/useAuthRoles";
 import { useNavigate } from "react-router-dom";
@@ -34,7 +46,17 @@ const toastOptions = {
   theme: "light",
 };
 
-ChartJS.register(ArcElement, Tooltip, Legend);
+ChartJS.register(
+  ArcElement,
+  Tooltip,
+  Legend,
+  CategoryScale,
+  LineController,
+  LineElement,
+  PointElement,
+  LinearScale,
+  Title
+);
 
 const StyledCard = styled(Card)(({ theme }) => ({
   marginBottom: theme.spacing(2),
@@ -54,7 +76,7 @@ const Supraveghetor = () => {
   const [supraveghetorData, setSupraveghetorData] = useState("");
   const id = useRef("");
   const history = useNavigate();
-
+  const [chartData, setChartData] = useState({});
   const fetchPatient = useCallback(async () => {
     try {
       const responsePacient = await fetch(
@@ -122,6 +144,95 @@ const Supraveghetor = () => {
     }
   }, [id, token]);
 
+  useEffect(() => {
+    const fetchDateIstorice = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:5000/api/get-date-istorice`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+
+          // Now that you have the data, you can set the chart.
+          setChartData({
+            labels: data.data.map((item) => item.id_date),
+            datasets: [
+              {
+                label: "Tensiune arteriala",
+                data: data.data.map((item) => item.tensiune),
+                backgroundColor: "rgba(75,192,192,0.6)",
+                borderWidth: 4,
+              },
+              {
+                label: "Temperatura corporala",
+                data: data.data.map((item) => item.temperatura_corp),
+                backgroundColor: "rgba(192,192,75,0.6)",
+                borderWidth: 4,
+              },
+              {
+                label: "Greutate",
+                data: data.data.map((item) => item.greutate),
+                backgroundColor: "rgba(192,75,192,0.6)",
+                borderWidth: 4,
+              },
+              {
+                label: "Glicemie",
+                data: data.data.map((item) => item.glicemie),
+                backgroundColor: "rgba(75,75,192,0.6)",
+                borderWidth: 4,
+              },
+            ],
+          });
+        } else {
+          const data = await response.json();
+          console.log("Error:", data.message || data.msg);
+        }
+      } catch (error) {
+        console.log("Error:", error);
+      }
+    };
+
+    fetchDateIstorice();
+  }, [token]);
+
+  const handleClearAlarma = async (id_alarma) => {
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/clear-alarma/${id_alarma}`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.ok) {
+        // Handle success
+        const data = await response.json();
+        toast.success(`${data.msg}`, toastOptions);
+        window.location.reload(false);
+      } else {
+        const data = await response.json();
+        // Handle error
+        // data.message in case of JWT expired
+        // Handle error with single message
+        toast.error(`${data.message || data.msg}`, toastOptions);
+      }
+    } catch (error) {
+      // Handle Error
+      console.log("Error:", error);
+    }
+  };
+
   const fetchSupraveghetor = useCallback(async () => {
     try {
       const responseSupraveghetor = await fetch(
@@ -148,7 +259,16 @@ const Supraveghetor = () => {
   }, [userRole, fetchSupraveghetor]);
 
   if (userRole !== "Supraveghetor") {
-    return <Typography> Niciun pacient asociat</Typography>;
+    return (
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="50vh"
+      >
+        <Alert severity="info">Niciun pacient asociat</Alert>
+      </Box>
+    );
   }
 
   const logoutUser = () => {
@@ -220,7 +340,7 @@ const Supraveghetor = () => {
               avatar={<StyledAvatar>{pacientData.nume.charAt(0)}</StyledAvatar>}
               action={
                 <Button variant="outlined" color="error" onClick={logoutUser}>
-                  Logout
+                  Deconectare
                 </Button>
               }
               title={`${pacientData.nume} ${pacientData.prenume}`}
@@ -232,12 +352,15 @@ const Supraveghetor = () => {
         <Grid item xs={12} sm={6}>
           <StyledCard>
             <CardHeader
-              title="Personal Details"
+              title="Detalii personale"
               titleTypographyProps={{ variant: "h6" }}
             />
             <CardContent>
               <Typography>
                 <strong>CNP:</strong> {pacientData.cnp}
+              </Typography>
+              <Typography>
+                <strong>Varsta:</strong> {pacientData.varsta}
               </Typography>
               <Typography>
                 <strong>Adresa:</strong> {pacientData.adresa}
@@ -256,7 +379,7 @@ const Supraveghetor = () => {
         <Grid item xs={12} sm={6}>
           <StyledCard>
             <CardHeader
-              title="Work & Education"
+              title="Detalii profesie"
               titleTypographyProps={{ variant: "h6" }}
             />
             <CardContent>
@@ -269,9 +392,6 @@ const Supraveghetor = () => {
               <Typography>
                 <strong>Loc Munca:</strong> {pacientData.loc_munca}
               </Typography>
-              <Typography>
-                <strong>Varsta:</strong> {pacientData.varsta}
-              </Typography>
             </CardContent>
           </StyledCard>
         </Grid>
@@ -279,7 +399,7 @@ const Supraveghetor = () => {
         <Grid item xs={12} sm={6}>
           <StyledCard>
             <CardHeader
-              title="Medical Details"
+              title="Detalii medicale"
               titleTypographyProps={{ variant: "h6" }}
             />
             <CardContent>
@@ -323,7 +443,7 @@ const Supraveghetor = () => {
         <Grid item xs={12} sm={6}>
           <StyledCard>
             <CardHeader
-              title="Collected Details"
+              title="Detalii colectate"
               titleTypographyProps={{ variant: "h6" }}
             />
             <CardContent>
@@ -385,6 +505,16 @@ const Supraveghetor = () => {
               <Typography>
                 <strong>Mesaj: </strong> {pacientData.mesaj}
               </Typography>
+              {pacientData.id_alarma && (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  style={{ marginTop: "15px" }}
+                  onClick={() => handleClearAlarma(pacientData.id_alarma)}
+                >
+                  Trateaza alarma
+                </Button>
+              )}
             </CardContent>
           </StyledCard>
         </Grid>
@@ -411,9 +541,43 @@ const Supraveghetor = () => {
           </StyledCard>
         </Grid>
       </Grid>
-      <div style={{ maxWidth: "400px", maxHeight: "400px" }}>
+      <Typography
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "60px",
+        }}
+      >
+        <strong>Grafic date medicale</strong>
+      </Typography>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "400px",
+        }}
+      >
         <Pie data={data} />
       </div>
+      <Typography
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "60px",
+        }}
+      >
+        <strong>Grafic istoric date medicale</strong>
+      </Typography>
+      <Line
+        data={chartData}
+        options={{
+          responsive: true,
+          title: { text: "Valori Fiziologice", display: true },
+        }}
+      />
     </Container>
   );
 };

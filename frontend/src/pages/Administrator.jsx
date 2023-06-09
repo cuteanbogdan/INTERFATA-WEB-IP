@@ -158,6 +158,7 @@ const Administrator = () => {
         return {
           userId: user[key],
           name: user["nume"],
+          prenume: user["prenume"],
           email: user["email"],
           role: user["rol"],
         };
@@ -191,7 +192,7 @@ const Administrator = () => {
       <Grid container spacing={3}>
         <Grid item xs={10}>
           <Typography variant="h4" sx={{ marginBottom: "2rem" }}>
-            User Management
+            Administrare utilizatori
           </Typography>
         </Grid>
         <Grid
@@ -238,20 +239,20 @@ const Administrator = () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <CustomTableCell>ID</CustomTableCell>
-                  <CustomTableCell>Name</CustomTableCell>
+                  <CustomTableCell>Nume</CustomTableCell>
+                  <CustomTableCell>Prenume</CustomTableCell>
                   <CustomTableCell>Email</CustomTableCell>
                   <CustomTableCell>Rol</CustomTableCell>
-                  <CustomTableCell>Action</CustomTableCell>
+                  <CustomTableCell>Actiune</CustomTableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {users.map((user) => (
                   <CustomTableRow key={getNonNullId(user).email}>
-                    <CustomTableCell>
-                      {getNonNullId(user).userId}
-                    </CustomTableCell>
                     <CustomTableCell>{getNonNullId(user).name}</CustomTableCell>
+                    <CustomTableCell>
+                      {getNonNullId(user).prenume}
+                    </CustomTableCell>
                     <CustomTableCell>
                       {getNonNullId(user).email}
                     </CustomTableCell>
@@ -264,7 +265,7 @@ const Administrator = () => {
                           handleDeleteUser(getNonNullId(user).email)
                         }
                       >
-                        Delete
+                        Sterge
                       </Button>
                     </CustomTableCell>
                   </CustomTableRow>
@@ -280,7 +281,7 @@ const Administrator = () => {
             onClick={() => setOpen(true)}
             fullWidth
           >
-            Create User
+            Creeaza utilizator
           </Button>
         </Grid>
         <Grid item xs={12} md={6}>
@@ -290,12 +291,12 @@ const Administrator = () => {
             onClick={() => logoutUser()}
             fullWidth
           >
-            Logout
+            Deconectare
           </Button>
         </Grid>
       </Grid>
       <Dialog open={open} onClose={() => setOpen(false)}>
-        <DialogTitle>Create User</DialogTitle>
+        <DialogTitle>Detalii utilizator</DialogTitle>
         <DialogContent>
           <UserForm
             ingrijitori={ingrijitori}

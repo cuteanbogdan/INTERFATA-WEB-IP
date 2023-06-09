@@ -100,7 +100,7 @@ const UpdatePassword = () => {
           >
             <CardContent>
               <Typography variant="h5" align="center" gutterBottom>
-                Update Password
+                Actualizare parola
               </Typography>
               <form onSubmit={handleSubmit}>
                 <input type="hidden" name="token" value={token} />
@@ -110,7 +110,7 @@ const UpdatePassword = () => {
                   name="password"
                   fullWidth
                   id="password"
-                  placeholder="Please Enter New Password"
+                  placeholder="Introduceti parola noua.."
                   value={password}
                   required
                   inputProps={{ minLength: 6 }}
@@ -118,7 +118,7 @@ const UpdatePassword = () => {
                   helperText={
                     password.length > 0 &&
                     password.length < 6 &&
-                    "Password should be at least 6 characters long"
+                    "Parola trebuie sa aiba minim 6 caractere"
                   }
                   onChange={(e) => setPassword(e.target.value)}
                   sx={{
@@ -131,7 +131,7 @@ const UpdatePassword = () => {
 
                 <Box sx={{ display: "flex", justifyContent: "center", p: 2 }}>
                   <Button type="submit" variant="contained">
-                    Update Password
+                    Actualizeaza parola
                   </Button>
                 </Box>
               </form>

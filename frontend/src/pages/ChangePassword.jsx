@@ -102,7 +102,7 @@ const ChangePassword = () => {
           >
             <CardContent>
               <Typography variant="h5" align="center" gutterBottom>
-                Change Password
+                Schimba parola
               </Typography>
               <TextField
                 label="Email"
@@ -114,9 +114,7 @@ const ChangePassword = () => {
                 value={email}
                 error={isSubmitted && !isValid}
                 helperText={
-                  isSubmitted &&
-                  !isValid &&
-                  "Please enter a valid email address"
+                  isSubmitted && !isValid && "Introduceti o adresa valida!"
                 }
                 onChange={handleChange}
                 sx={{
@@ -129,7 +127,7 @@ const ChangePassword = () => {
             </CardContent>
             <Box sx={{ display: "flex", justifyContent: "center", p: 2 }}>
               <Button variant="contained" onClick={handlePasswordReset}>
-                Reset Password
+                Reseteaza parola
               </Button>
             </Box>
           </Card>

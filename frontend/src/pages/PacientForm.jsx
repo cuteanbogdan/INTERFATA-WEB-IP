@@ -31,6 +31,7 @@ const PacientForm = ({
   const [varsta, setVarsta] = useState("");
   const [supraveghetorId, setSupraveghetorId] = useState("");
   const [ingrijitorId, setIngrijitorId] = useState("");
+  const [touchedCNP, setTouchedCNP] = useState(false);
 
   const rol = "Pacient";
 
@@ -110,7 +111,15 @@ const PacientForm = ({
               sx={{ width: "200%" }}
               required
               value={cnp}
-              onChange={(e) => setCnp(e.target.value)}
+              onChange={(e) => {
+                if (!touchedCNP) {
+                  setTouchedCNP(true);
+                }
+                if (e.target.value.length <= 13) {
+                  setCnp(e.target.value);
+                }
+              }}
+              error={touchedCNP && cnp.length !== 13}
             />
             <TextField
               label="Nume"

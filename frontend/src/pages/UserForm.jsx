@@ -110,11 +110,11 @@ const UserForm = ({
     >
       <form onSubmit={handleSubmit}>
         <FormControl fullWidth margin="normal">
-          <InputLabel>User Type</InputLabel>
+          <InputLabel>Tip utilizator</InputLabel>
           <Select
             value={rol}
             onChange={handleUserTypeChange}
-            label="User Type"
+            label="Tip utilizator"
             required
           >
             <MenuItem value="Administrator">Administrator</MenuItem>
