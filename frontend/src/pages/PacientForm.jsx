@@ -66,7 +66,10 @@ const PacientForm = ({
       if (response.ok) {
         // Handle success
         fetchPatients();
-        toast.success(`Pacient ${nume} added successfully`, toastOptions);
+        toast.success(
+          `Pacientul ${nume} a fost adaugat cu success!`,
+          toastOptions
+        );
       } else {
         const data = await response.json();
         // Handle error
@@ -137,6 +140,7 @@ const PacientForm = ({
               margin="normal"
               fullWidth
               sx={{ width: "200%" }}
+              required
               value={prenume}
               onChange={(e) => setPrenume(e.target.value)}
             />
@@ -146,6 +150,7 @@ const PacientForm = ({
               margin="normal"
               fullWidth
               sx={{ width: "200%" }}
+              required
               multiline
               value={varsta}
               onChange={(e) => setVarsta(e.target.value)}
@@ -166,6 +171,7 @@ const PacientForm = ({
               margin="normal"
               fullWidth
               sx={{ width: "200%" }}
+              required
               multiline
               value={nr_tel}
               onChange={(e) => setNr_tel(e.target.value)}

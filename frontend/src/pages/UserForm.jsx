@@ -30,6 +30,8 @@ const UserForm = ({
   const [loc_munca, setLoc_munca] = useState("");
   const [password, setPassword] = useState("");
   const [varsta, setVarsta] = useState("");
+  const [touchedCNP, setTouchedCNP] = useState(false);
+
   const [supraveghetorId, setSupraveghetorId] = useState("");
   const [ingrijitorId, setIngrijitorId] = useState("");
   const handleUserTypeChange = (event) => {
@@ -79,7 +81,10 @@ const UserForm = ({
       if (response.ok) {
         // Handle success
         fetchUsers();
-        toast.success(`User ${nume} added successfully`, toastOptions);
+        toast.success(
+          `Utilizatorul ${nume} a fost adaugat cu success!`,
+          toastOptions
+        );
       } else {
         const data = await response.json();
         // Handle error
@@ -231,7 +236,15 @@ const UserForm = ({
                 sx={{ width: "200%" }}
                 required
                 value={cnp}
-                onChange={(e) => setCnp(e.target.value)}
+                onChange={(e) => {
+                  if (!touchedCNP) {
+                    setTouchedCNP(true);
+                  }
+                  if (e.target.value.length <= 13) {
+                    setCnp(e.target.value);
+                  }
+                }}
+                error={touchedCNP && cnp.length !== 13}
               />
               <TextField
                 label="Nume"
@@ -249,6 +262,7 @@ const UserForm = ({
                 margin="normal"
                 fullWidth
                 sx={{ width: "200%" }}
+                required
                 value={prenume}
                 onChange={(e) => setPrenume(e.target.value)}
               />
@@ -258,6 +272,7 @@ const UserForm = ({
                 margin="normal"
                 fullWidth
                 sx={{ width: "200%" }}
+                required
                 multiline
                 value={varsta}
                 onChange={(e) => setVarsta(e.target.value)}
@@ -278,6 +293,7 @@ const UserForm = ({
                 margin="normal"
                 fullWidth
                 sx={{ width: "200%" }}
+                required
                 multiline
                 value={nr_tel}
                 onChange={(e) => setNr_tel(e.target.value)}

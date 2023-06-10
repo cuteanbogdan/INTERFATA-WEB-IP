@@ -278,7 +278,11 @@ const Administrator = () => {
           <Button
             variant="contained"
             color="primary"
-            onClick={() => setOpen(true)}
+            onClick={() => {
+              setOpen(true);
+              fetchIngrijitori();
+              fetchSupraveghetori();
+            }}
             fullWidth
           >
             Creeaza utilizator

@@ -758,7 +758,7 @@ const Doctor = () => {
 
             <form onSubmit={handleSubmitDateColectate}>
               <Typography variant="h5" gutterBottom>
-                Parametrii
+                Parametri
               </Typography>
               <Divider sx={{ mt: 1, mb: 2 }} />
               <TextField
