@@ -6,6 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import useAuth from "../utils/useAuth";
+import CenteredSpinner from "../utils/CenteredSpinner";
 import {
   Table,
   TableBody,
@@ -114,7 +115,7 @@ const Administrator = () => {
   }, [fetchUsers, fetchSupraveghetori, fetchIngrijitori]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <CenteredSpinner />;
   }
   if (!authenticated) {
     history("/login");

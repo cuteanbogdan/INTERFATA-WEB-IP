@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
-
+import CenteredSpinner from "../utils/CenteredSpinner";
 import {
   TableContainer,
   Table,
@@ -163,7 +163,7 @@ const Doctor = () => {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <CenteredSpinner />;
   }
 
   if (!authenticated) {

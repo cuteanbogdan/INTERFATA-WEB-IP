@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
+import CenteredSpinner from "../utils/CenteredSpinner";
 import {
   Container,
   Typography,
@@ -333,7 +334,7 @@ const Patient = () => {
   };
 
   if (loading || !pacientData) {
-    return <Typography>Loading...</Typography>;
+    return <CenteredSpinner />;
   }
   if (!authenticated) {
     history("/login");

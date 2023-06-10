@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { ToastContainer, toast } from "react-toastify";
+import CenteredSpinner from "../utils/CenteredSpinner";
 import {
   Container,
   Typography,
@@ -311,14 +312,14 @@ const Ingrijitor = () => {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <CenteredSpinner />;
   }
   if (!authenticated) {
     history("/login");
     return null;
   }
   if (!pacientData) {
-    return <Typography>Loading...</Typography>;
+    return <CenteredSpinner />;
   }
 
   const data = {
