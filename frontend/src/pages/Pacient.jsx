@@ -281,35 +281,40 @@ const Patient = () => {
           const data = await response.json();
 
           // Now that you have the data, you can set the chart.
-          setChartData({
-            labels: data.data.map((item) => item.id_date),
-            datasets: [
-              {
-                label: "Tensiune arteriala",
-                data: data.data.map((item) => item.tensiune),
-                backgroundColor: "rgba(75,192,192,0.6)",
-                borderWidth: 4,
-              },
-              {
-                label: "Temperatura corporala",
-                data: data.data.map((item) => item.temperatura_corp),
-                backgroundColor: "rgba(192,192,75,0.6)",
-                borderWidth: 4,
-              },
-              {
-                label: "Greutate",
-                data: data.data.map((item) => item.greutate),
-                backgroundColor: "rgba(192,75,192,0.6)",
-                borderWidth: 4,
-              },
-              {
-                label: "Glicemie",
-                data: data.data.map((item) => item.glicemie),
-                backgroundColor: "rgba(75,75,192,0.6)",
-                borderWidth: 4,
-              },
-            ],
-          });
+          if (data.data && Array.isArray(data.data)) {
+            setChartData({
+              labels: data.data.map((item) => item.id_date),
+              datasets: [
+                {
+                  label: "Tensiune arteriala",
+                  data: data.data.map((item) => item.tensiune),
+                  backgroundColor: "rgba(75,192,192,0.6)",
+                  borderWidth: 4,
+                },
+                {
+                  label: "Temperatura corporala",
+                  data: data.data.map((item) => item.temperatura_corp),
+                  backgroundColor: "rgba(192,192,75,0.6)",
+                  borderWidth: 4,
+                },
+                {
+                  label: "Greutate",
+                  data: data.data.map((item) => item.greutate),
+                  backgroundColor: "rgba(192,75,192,0.6)",
+                  borderWidth: 4,
+                },
+                {
+                  label: "Glicemie",
+                  data: data.data.map((item) => item.glicemie),
+                  backgroundColor: "rgba(75,75,192,0.6)",
+                  borderWidth: 4,
+                },
+              ],
+            });
+          } else {
+            // Handle the case when data.data is not an array or doesn't exist
+            console.error("Unexpected data format:", data);
+          }
         } else {
           const data = await response.json();
           console.log("Error:", data.message || data.msg);
@@ -327,7 +332,7 @@ const Patient = () => {
     history("/login");
   };
 
-  if (loading || !pacientData || !chartData) {
+  if (loading || !pacientData) {
     return <Typography>Loading...</Typography>;
   }
   if (!authenticated) {
@@ -692,13 +697,29 @@ const Patient = () => {
       >
         <strong>Grafic istoric date medicale</strong>
       </Typography>
-      <Line
-        data={chartData}
-        options={{
-          responsive: true,
-          title: { text: "Valori Fiziologice", display: true },
-        }}
-      />
+      {chartData &&
+      chartData.datasets &&
+      chartData.datasets[0].data.length > 0 ? (
+        <Line
+          data={chartData}
+          options={{
+            responsive: true,
+            title: { text: "Valori Fiziologice", display: true },
+          }}
+        />
+      ) : (
+        <Typography
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "60px",
+          }}
+        >
+          Nu exista istoric date
+        </Typography>
+      )}
+
       <>
         {userRole === "Doctor" && (
           <Grid item xs={12}>
