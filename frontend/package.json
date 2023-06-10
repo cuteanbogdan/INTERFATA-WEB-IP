@@ -1,6 +1,7 @@
 {
   "name": "frontend",
   "version": "0.1.0",
+  "homepage": "https://interfata-web-ip.vercel.app/",
   "private": true,
   "dependencies": {
     "@mui/icons-material": "^5.11.16",
