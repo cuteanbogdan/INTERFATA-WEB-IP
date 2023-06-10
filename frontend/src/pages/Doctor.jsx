@@ -99,12 +99,15 @@ const Doctor = () => {
   // Fetch patients data from server and set the state
   const fetchPatients = useCallback(async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/getallpacients", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        "https://server-ip2023.herokuapp.com/api/getallpacients",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       const data = await response.json();
       setPatients(data.data);
     } catch (error) {
@@ -115,7 +118,7 @@ const Doctor = () => {
   const fetchSupraveghetori = useCallback(async () => {
     try {
       const response = await fetch(
-        "http://localhost:5000/api/getallsupraveghetori",
+        "https://server-ip2023.herokuapp.com/api/getallsupraveghetori",
         {
           method: "POST",
           headers: {
@@ -133,7 +136,7 @@ const Doctor = () => {
   const fetchIngrijitori = useCallback(async () => {
     try {
       const response = await fetch(
-        "http://localhost:5000/api/getallingrijitori",
+        "https://server-ip2023.herokuapp.com/api/getallingrijitori",
         {
           method: "POST",
           headers: {
@@ -179,7 +182,7 @@ const Doctor = () => {
   const handleDeletePacient = async (userId) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/delete-pacient/${userId}`,
+        `https://server-ip2023.herokuapp.com/api/delete-pacient/${userId}`,
         {
           method: "POST",
           headers: {
@@ -230,7 +233,7 @@ const Doctor = () => {
   const updatePatientDetails = async (id) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/update-pacient-details/${id}`,
+        `https://server-ip2023.herokuapp.com/api/update-pacient-details/${id}`,
         {
           method: "PUT",
           headers: {
@@ -261,7 +264,7 @@ const Doctor = () => {
   const updateDateMedicalePatient = async (id) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/update-date-medicale/${id}`,
+        `https://server-ip2023.herokuapp.com/api/update-date-medicale/${id}`,
         {
           method: "PUT",
           headers: {
@@ -291,7 +294,7 @@ const Doctor = () => {
   const updateParametri = async (id) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/update-parametri/${id}`,
+        `https://server-ip2023.herokuapp.com/api/update-parametri/${id}`,
         {
           method: "PUT",
           headers: {
@@ -321,7 +324,7 @@ const Doctor = () => {
   const fetchPatientDetails = async (id) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/get-pacient-details/${id}`,
+        `https://server-ip2023.herokuapp.com/api/get-pacient-details/${id}`,
         {
           method: "POST",
           headers: {
@@ -345,7 +348,7 @@ const Doctor = () => {
   const fetchParametri = async (id) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/get-parametri/${id}`,
+        `https://server-ip2023.herokuapp.com/api/get-parametri/${id}`,
         {
           method: "POST",
           headers: {
@@ -369,7 +372,7 @@ const Doctor = () => {
   const fetchDateMedicalePatient = async (id) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/get-date-medicale-patient/${id}`,
+        `https://server-ip2023.herokuapp.com/api/get-date-medicale-patient/${id}`,
         {
           method: "POST",
           headers: {

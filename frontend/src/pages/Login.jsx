@@ -35,7 +35,7 @@ const Login = () => {
   const loginUser = async () => {
     setIsSubmitted(true);
     return axios
-      .post(`http://localhost:5000/api/login`, {
+      .post(`https://server-ip2023.herokuapp.com/api/login`, {
         email,
         password,
       })

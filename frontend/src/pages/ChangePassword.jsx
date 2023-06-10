@@ -34,7 +34,7 @@ const ChangePassword = () => {
     if (isValid) {
       try {
         const response = await fetch(
-          "http://localhost:5000/email/change-password-email",
+          "https://server-ip2023.herokuapp.com/email/change-password-email",
           {
             method: "POST",
             headers: {

@@ -80,7 +80,7 @@ const Supraveghetor = () => {
   const fetchPatient = useCallback(async () => {
     try {
       const responsePacient = await fetch(
-        `http://localhost:5000/api/get-pacient-details/${id.current}`,
+        `https://server-ip2023.herokuapp.com/api/get-pacient-details/${id.current}`,
         {
           method: "POST",
           headers: {
@@ -91,7 +91,7 @@ const Supraveghetor = () => {
       const dataPacient = await responsePacient.json();
       console.log(dataPacient);
       const responseMedicale = await fetch(
-        `http://localhost:5000/api/get-date-medicale-patient/${dataPacient.data.id_medical}`,
+        `https://server-ip2023.herokuapp.com/api/get-date-medicale-patient/${dataPacient.data.id_medical}`,
         {
           method: "POST",
           headers: {
@@ -101,7 +101,7 @@ const Supraveghetor = () => {
       );
 
       const responseColectate = await fetch(
-        `http://localhost:5000/api/get-date-colectate-patient/${dataPacient.data.id_colectie}`,
+        `https://server-ip2023.herokuapp.com/api/get-date-colectate-patient/${dataPacient.data.id_colectie}`,
         {
           method: "POST",
           headers: {
@@ -110,7 +110,7 @@ const Supraveghetor = () => {
         }
       );
       const responseAlarme = await fetch(
-        `http://localhost:5000/api/get-alarm-details/${dataPacient.data.id_alarma}`,
+        `https://server-ip2023.herokuapp.com/api/get-alarm-details/${dataPacient.data.id_alarma}`,
         {
           method: "GET",
           headers: {
@@ -120,7 +120,7 @@ const Supraveghetor = () => {
       );
 
       const responseRecomandare = await fetch(
-        `http://localhost:5000/api/get-recomandari-details/${dataPacient.data.id_recomandare}`,
+        `https://server-ip2023.herokuapp.com/api/get-recomandari-details/${dataPacient.data.id_recomandare}`,
         {
           method: "GET",
           headers: {
@@ -148,7 +148,7 @@ const Supraveghetor = () => {
     const fetchDateIstorice = async () => {
       try {
         const response = await fetch(
-          `http://localhost:5000/api/get-date-istorice`,
+          `https://server-ip2023.herokuapp.com/api/get-date-istorice`,
           {
             method: "GET",
             headers: {
@@ -205,7 +205,7 @@ const Supraveghetor = () => {
   const handleClearAlarma = async (id_alarma) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/clear-alarma/${id_alarma}`,
+        `https://server-ip2023.herokuapp.com/api/clear-alarma/${id_alarma}`,
         {
           method: "POST",
           headers: {
@@ -236,7 +236,7 @@ const Supraveghetor = () => {
   const fetchSupraveghetor = useCallback(async () => {
     try {
       const responseSupraveghetor = await fetch(
-        `http://localhost:5000/api/get-supraveghetor`,
+        `https://server-ip2023.herokuapp.com/api/get-supraveghetor`,
         {
           method: "POST",
           headers: {
