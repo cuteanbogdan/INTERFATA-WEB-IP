@@ -327,16 +327,14 @@ const Patient = () => {
     history("/login");
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
+  if (loading || !pacientData || !chartData) {
+    return <Typography>Loading...</Typography>;
   }
   if (!authenticated) {
     history("/login");
     return null;
   }
-  if (!pacientData) {
-    return <Typography>Loading...</Typography>;
-  }
+
   const data = {
     labels: [
       "Tensiune arteriala",
